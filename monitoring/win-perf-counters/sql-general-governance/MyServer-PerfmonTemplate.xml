@@ -1,0 +1,497 @@
+<?xml version="1.0"?>
+<DataCollectorSet>
+	<Status>1</Status>
+	<Duration>0</Duration>
+	<Description>
+	</Description>
+	<DescriptionUnresolved>
+	</DescriptionUnresolved>
+	<DisplayName>
+	</DisplayName>
+	<DisplayNameUnresolved>
+	</DisplayNameUnresolved>
+	<SchedulesEnabled>-1</SchedulesEnabled>
+	<LatestOutputLocation>C:\PerfLogs\Admin\SQL Server Performance Analyzer Monitor\</LatestOutputLocation>
+	<Name>SQL Server Performance Analyzer Monitor</Name>
+	<OutputLocation>C:\PerfLogs\Admin\SQL Server Performance Analyzer Monitor\</OutputLocation>
+	<RootPath>%systemdrive%\PerfLogs\Admin\SQL Server Performance Analyzer Monitor</RootPath>
+	<Segment>-1</Segment>
+	<SegmentMaxDuration>43200</SegmentMaxDuration>
+	<SegmentMaxSize>32</SegmentMaxSize>
+	<SerialNumber>1</SerialNumber>
+	<Server>
+	</Server>
+	<Subdirectory>
+	</Subdirectory>
+	<SubdirectoryFormat>1</SubdirectoryFormat>
+	<SubdirectoryFormatPattern>
+	</SubdirectoryFormatPattern>
+	<Task>
+	</Task>
+	<TaskRunAsSelf>0</TaskRunAsSelf>
+	<TaskArguments>
+	</TaskArguments>
+	<TaskUserTextArguments>
+	</TaskUserTextArguments>
+	<UserAccount>SYSTEM</UserAccount>
+	<Security></Security>
+	<StopOnCompletion>0</StopOnCompletion>
+	<PerformanceCounterDataCollector>
+		<DataCollectorType>0</DataCollectorType>
+		<Name>DataCollector01</Name>
+		<FileName>MyServer</FileName>
+		<FileNameFormat>1</FileNameFormat>
+		<FileNameFormatPattern>\-yyyyMMdd\-NNNN</FileNameFormatPattern>
+		<LogAppend>0</LogAppend>
+		<LogCircular>0</LogCircular>
+		<LogOverwrite>0</LogOverwrite>
+		<LatestOutputLocation></LatestOutputLocation>
+		<DataSourceName>
+		</DataSourceName>
+		<SampleInterval>30</SampleInterval>
+		<SegmentMaxRecords>0</SegmentMaxRecords>
+		<LogFileFormat>1</LogFileFormat>
+		<Counter>\\MyServer\LogicalDisk(*)\Avg. Disk Bytes/Read</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Avg. Disk Bytes/Transfer</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Avg. Disk Bytes/Write</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Avg. Disk Queue Length</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Avg. Disk sec/Read</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Avg. Disk sec/Write</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Disk Bytes/sec</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Disk Read Bytes/sec</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Disk Reads/sec</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Disk Transfers/sec</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Disk Write Bytes/sec</Counter>
+		<Counter>\\MyServer\LogicalDisk(*)\Disk Writes/sec</Counter>
+		<Counter>\\MyServer\Memory\Available MBytes</Counter>
+		<Counter>\\MyServer\Memory\Cache Bytes</Counter>
+		<Counter>\\MyServer\Memory\Commit Limit</Counter>
+		<Counter>\\MyServer\Memory\Committed Bytes</Counter>
+		<Counter>\\MyServer\Memory\Free &amp; Zero Page List Bytes</Counter>
+		<Counter>\\MyServer\Memory\Free System Page Table Entries</Counter>
+		<Counter>\\MyServer\Memory\Page Faults/sec</Counter>
+		<Counter>\\MyServer\Memory\Page Reads/sec</Counter>
+		<Counter>\\MyServer\Memory\Page Writes/sec</Counter>
+		<Counter>\\MyServer\Memory\Pages Input/sec</Counter>
+		<Counter>\\MyServer\Memory\Pages Output/sec</Counter>
+		<Counter>\\MyServer\Memory\Pages/sec</Counter>
+		<Counter>\\MyServer\Memory\Transition Faults/sec</Counter>
+		<Counter>\\MyServer\Network Interface(*)\Bytes Received/sec</Counter>
+		<Counter>\\MyServer\Network Interface(*)\Bytes Sent/sec</Counter>
+		<Counter>\\MyServer\Network Interface(*)\Bytes Total/sec</Counter>
+		<Counter>\\MyServer\Network Interface(*)\Current Bandwidth</Counter>
+		<Counter>\\MyServer\Network Interface(*)\Offloaded Connections</Counter>
+		<Counter>\\MyServer\Network Interface(*)\Output Queue Length</Counter>
+		<Counter>\\MyServer\Paging File(*)\% Usage</Counter>
+		<Counter>\\MyServer\Paging File(*)\% Usage Peak</Counter>
+		<Counter>\\MyServer\Process(*)\% Privileged Time</Counter>
+		<Counter>\\MyServer\Process(*)\% Processor Time</Counter>
+		<Counter>\\MyServer\Process(*)\% User Time</Counter>
+		<Counter>\\MyServer\Process(*)\Elapsed Time</Counter>
+		<Counter>\\MyServer\Process(*)\Handle Count</Counter>
+		<Counter>\\MyServer\Process(*)\ID Process</Counter>
+		<Counter>\\MyServer\Process(*)\Priority Base</Counter>
+		<Counter>\\MyServer\Process(*)\Private Bytes</Counter>
+		<Counter>\\MyServer\Process(*)\Thread Count</Counter>
+		<Counter>\\MyServer\Processor(*)\% Processor Time</Counter>
+		<Counter>\\MyServer\Processor(*)\% Privileged Time</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Count Pull In Row</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Count Push Off Row</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Extent Deallocations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Extents Allocated/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Forwarded Records/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\FreeSpace Scans/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Full Scans/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Index Searches/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Mixed page allocations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Page Deallocations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Page Splits/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Pages Allocated/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Pages compressed/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Scan Point Revalidations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Table Lock Escalations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Work Files Created/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Work Tables Created/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Access Methods\Work Tables From Cache Ratio</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Buffer cache hit ratio</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Checkpoint pages/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Database pages</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Free list stalls/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Lazy writes/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Page life expectancy</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Page lookups/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Page reads/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Page writes/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Readahead pages/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Buffer Manager\Target pages</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Active cursors</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cache Hit Ratio</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cached Cursor Counts</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor Cache Use Counts/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor memory usage</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor Requests/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor worktable usage</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Number of active cursor plans</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\File Bytes Received/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Log Bytes Received/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Log remaining for undo</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Log Send Queue</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Mirrored Write Transactions/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Recovery Queue</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Redo Bytes Remaining</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Redone Bytes/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Replica(*)\Transaction Delay</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Active Transactions</Counter>
+<!--
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Commit table entries</Counter>
+-->
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Data File(s) Size (KB)</Counter>
+<!--
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log Bytes Flushed/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log Cache Hit Ratio</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log Cache Reads/sec</Counter>
+-->
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log File(s) Size (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log File(s) Used Size (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log Flush Wait Time</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log Flush Waits/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log Flushes/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Log Growths</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Percent Log Used</Counter>
+<!--
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Tracked transactions/sec</Counter>
+-->
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Transactions/sec</Counter>
+<!--
+		<Counter>\\MyServer\MSSQL$DW:Databases(*)\Write Transactions/sec</Counter>
+-->
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Active Temp Tables</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Connection Reset/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Event Notifications Delayed Drop</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Logical Connections</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Logins/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Logouts/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Non-atomic yield rate</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Processes blocked</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Temp Tables Creation Rate</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Temp Tables For Destruction</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\Transactions</Counter>
+		<Counter>\\MyServer\MSSQL$DW:General Statistics\User Connections</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Latches\Average Latch Wait Time (ms)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Latches\Latch Waits/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Latches\Number of SuperLatches</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Latches\SuperLatch Demotions/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Latches\SuperLatch Promotions/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Latches\Total Latch Wait Time (ms)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Locks(*)\Average Wait Time (ms)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Locks(*)\Lock Requests/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Locks(*)\Lock Timeouts (timeout &gt; 0)/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Locks(*)\Lock Timeouts/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Locks(*)\Lock Wait Time (ms)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Locks(*)\Lock Waits/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Locks(*)\Number of Deadlocks/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Connection Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Free Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Granted Workspace Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Lock Blocks</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Lock Blocks Allocated</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Lock Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Lock Owner Blocks</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Lock Owner Blocks Allocated</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Maximum Workspace Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Memory Grants Outstanding</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Memory Grants Pending</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Optimizer Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Reserved Server Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\SQL Cache Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Stolen Server Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Target Server Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Memory Manager\Total Server Memory (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Hit Ratio</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Object Counts</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Objects in use</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Pages</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Auto-Param Attempts/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Batch Requests/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Failed Auto-Params/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Forced Parameterizations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Guided plan executions/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Misguided plan executions/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Safe Auto-Params/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\SQL Attention rate</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\SQL Compilations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\SQL Re-Compilations/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:SQL Statistics\Unsafe Auto-Params/sec</Counter>
+		<Counter>\\MyServer\SQLServer:SSIS Pipeline 12.0\*</Counter>
+		<Counter>\\MyServer\SQLServer:SSIS Service 12.0\*</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Free Space in tempdb (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Longest Transaction Running Time</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\NonSnapshot Version Transactions</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Snapshot Transactions</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Transactions</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Update conflict ratio</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Update Snapshot Transactions</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Version Cleanup rate (KB/s)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Version Generation rate (KB/s)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Version Store Size (KB)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Version Store unit count</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Version Store unit creation</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Transactions\Version Store unit truncation</Counter>
+		<Counter>\\MyServer\System\Context Switches/sec</Counter>
+		<Counter>\\MyServer\System\File Data Operations/sec</Counter>
+		<Counter>\\MyServer\System\File Read Bytes/sec</Counter>
+		<Counter>\\MyServer\System\File Read Operations/sec</Counter>
+		<Counter>\\MyServer\System\File Write Bytes/sec</Counter>
+		<Counter>\\MyServer\System\File Write Operations/sec</Counter>
+		<Counter>\\MyServer\System\Processes</Counter>
+		<Counter>\\MyServer\System\Processor Queue Length</Counter>
+		<Counter>\\MyServer\System\System Up Time</Counter>
+		<Counter>\\MyServer\System\Threads</Counter>
+<!--
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Bytes Received/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Bytes Sent/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Bytes Received/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Bytes Sent/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Harden Time (ms)</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Send Queue KB</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Pages Sent/sec</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Redo Queue KB</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Send/Receive Ack Time</Counter>
+		<Counter>\\MyServer\MSSQL$DW:Database Mirroring(*)\Transaction Delay</Counter>
+-->
+<!--
+		<Counter>\\MyServer\PhysicalDisk(*)\Disk Reads/sec</Counter>
+		<Counter>\\MyServer\PhysicalDisk(*)\Disk Writes/sec</Counter>
+		<Counter>\\MyServer\PhysicalDisk(*)\Avg. Disk sec/Read</Counter>
+		<Counter>\\MyServer\PhysicalDisk(*)\Avg. Disk sec/Write</Counter>
+		<Counter>\\MyServer\PhysicalDisk(*)\Disk Bytes/sec</Counter>
+-->
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Avg. Disk Bytes/Read</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Avg. Disk Bytes/Transfer</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Avg. Disk Bytes/Write</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Avg. Disk Queue Length</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Avg. Disk sec/Read</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Avg. Disk sec/Write</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Disk Bytes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Disk Read Bytes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Disk Reads/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Disk Transfers/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Disk Write Bytes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\LogicalDisk(*)\Disk Writes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Available MBytes</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Cache Bytes</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Commit Limit</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Committed Bytes</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Free &amp; Zero Page List Bytes</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Free System Page Table Entries</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Page Faults/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Page Reads/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Page Writes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Pages Input/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Pages Output/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Pages/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Memory\Transition Faults/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Network Interface(*)\Bytes Received/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Network Interface(*)\Bytes Sent/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Network Interface(*)\Bytes Total/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Network Interface(*)\Current Bandwidth</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Network Interface(*)\Offloaded Connections</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Network Interface(*)\Output Queue Length</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Paging File(*)\% Usage</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Paging File(*)\% Usage Peak</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\% Privileged Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\% Processor Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\% User Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\Elapsed Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\Handle Count</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\ID Process</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\Priority Base</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\Private Bytes</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Process(*)\Thread Count</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Processor(*)\% Processor Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\Processor(*)\% Privileged Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Count Pull In Row</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Count Push Off Row</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Extent Deallocations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Extent Allocated/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Forwarded Records/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\FreeSpace Scans/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Full Scans/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Index Searches/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Mixed page allocations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Page Deallocations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Page Splits/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Pages Allocated/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Pages compressed/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Scan Point Revalidations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Table Lock Escalations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Work Files Created/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Work Tables Created/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Access Methods\Work Tables From Cache Ratio</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Buffer cache hit ratio</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Checkpoint pages/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Database pages</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Free list stalls/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Lazy writes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Page life expectancy</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Page lookups/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Page reads/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Page writes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Readahead pages/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Buffer Manager\Target pages</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Active cursors</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cache Hit Ratio</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cached Cursor Counts</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor Cache Use Counts/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor memory usage</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor Requests/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Cursor worktable usage</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Cursor Manager by Type(*)\Number of active cursor plans</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\File Bytes Received/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Log Bytes Received/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Log remaining for undo</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Log Send Queue</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Mirrored Write Transactions/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Recovery Queue</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Redo Bytes Remaining</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Redone Bytes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Replica(*)\Transaction Delay</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Active Transactions</CounterDisplayName>
+<!--
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Commit table entries</CounterDisplayName>
+-->
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Data File(s) Size (KB)</CounterDisplayName>
+<!--
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log Bytes Flushed/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log Cache Hit Ratio</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log Cache Reads/sec</CounterDisplayName>
+-->
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log File(s) Size (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log File(s) Used Size (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log Flush Wait Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log Flush Waits/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log Flushes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Log Growths</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Percent Log Used</CounterDisplayName>
+<!--
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Tracked transactions/sec</CounterDisplayName>
+-->
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Transactions/sec</CounterDisplayName>
+<!--
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Databases(*)\Write Transactions/sec</CounterDisplayName>
+-->
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Active Temp Tables</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Connection Reset/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Event Notifications Delayed Drop</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Logical Connections</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Logins/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Logouts/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Non-atomic yield rate</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Processes blocked</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Temp Tables Creation Rate</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Temp Tables For Destruction</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\Transactions</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:General Statistics\User Connections</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Latches\Average Latch Wait Time (ms)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Latches\Latch Waits/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Latches\Number of SuperLatches</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Latches\SuperLatch Demotions/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Latches\SuperLatch Promotions/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Latches\Total Latch Wait Time (ms)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Locks(*)\Average Wait Time (ms)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Locks(*)\Lock Requests/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Locks(*)\Lock Timeouts (timeout &gt; 0)/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Locks(*)\Lock Timeouts/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Locks(*)\Lock Wait Time (ms)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Locks(*)\Lock Waits/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Locks(*)\Number of Deadlocks/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Connection Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Free Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Granted Workspace Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Lock Blocks</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Lock Blocks Allocated</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Lock Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Lock Owner Blocks</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Lock Owner Blocks Allocated</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Maximum Workspace Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Memory Grants Outstanding</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Memory Grants Pending</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Optimizer Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Reserved Server Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\SQL Cache Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Stolen Server Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Target Server Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Memory Manager\Total Server Memory (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Hit Ratio</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Object Counts</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Objects in use</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Plan Cache(*)\Cache Pages</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Auto-Param Attempts/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Batch Requests/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Failed Auto-Params/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Forced Parameterizations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Guided plan executions/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Misguided plan executions/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Safe Auto-Params/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\SQL Attention rate</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\SQL Compilations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\SQL Re-Compilations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:SQL Statistics\Unsafe Auto-Params/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\SQLServer:SSIS Pipeline 12.0\*</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\SQLServer:SSIS Service 12.0\*</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Free Space in tempdb (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Longest Transaction Running Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\NonSnapshot Version Transactions</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Snapshot Transactions</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Transactions</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Update conflict ratio</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Update Snapshot Transactions</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Version Cleanup rate (KB/s)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Version Generation rate (KB/s)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Version Store Size (KB)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Version Store unit count</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Version Store unit creation</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Transactions\Version Store unit truncation</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\Context Switches/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\File Data Operations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\File Read Bytes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\File Read Operations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\File Write Bytes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\File Write Operations/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\Processes</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\Processor Queue Length</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\System Up Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\System\Threads</CounterDisplayName>
+<!--
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Bytes Received/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Bytes Sent/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Bytes Received/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Bytes Sent/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Harden Time (ms)</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Log Send Queue KB</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Pages Sent/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Redo Queue KB</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Send/Receive Ack Time</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\MSSQL$DW:Database Mirroring(*)\Transaction Delay</CounterDisplayName>
+-->
+<!--
+		<CounterDisplayName>\\MyServer\PhysicalDisk(*)\Disk Reads/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\PhysicalDisk(*)\Disk Writes/sec</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\PhysicalDisk(*)\Avg. Disk sec/Read</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\PhysicalDisk(*)\Avg. Disk sec/Write</CounterDisplayName>
+		<CounterDisplayName>\\MyServer\PhysicalDisk(*)\Disk Bytes/sec</CounterDisplayName>
+-->
+	</PerformanceCounterDataCollector>
+	<DataManager>
+		<Enabled>0</Enabled>
+		<CheckBeforeRunning>0</CheckBeforeRunning>
+		<MinFreeDisk>0</MinFreeDisk>
+		<MaxSize>0</MaxSize>
+		<MaxFolderCount>0</MaxFolderCount>
+		<ResourcePolicy>0</ResourcePolicy>
+		<ReportFileName>report.html</ReportFileName>
+		<RuleTargetFileName>report.xml</RuleTargetFileName>
+		<EventsFileName>
+		</EventsFileName>
+	</DataManager>
+</DataCollectorSet>
