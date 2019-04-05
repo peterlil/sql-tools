@@ -1,0 +1,10 @@
+
+The only way I know of is using the Win32 API to help.
+
+You open a handle to the volume using Win32_Volume.DeviceID, modified slightly. You can open a handle to the volume using the format:
+\\.\Volume{[GUID]} 
+
+ You then need to issue IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS on the open handle to retrieve a VOLUME_DISK_EXTENTS structure. This structure will contain a list of physical disk ids for the volume.
+
+Using these disk ids you can query WMI on Win32_DiskDrive.Index to get the matching disk.
+ 
