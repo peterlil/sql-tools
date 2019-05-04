@@ -21,7 +21,8 @@ SELECT
 		END
 	) * 8192 / 1024 AS [Unused (kB)]
 FROM
-(	
+(
+	-- User tables
 	SELECT
 		sch.[name] + N'.' + t.[name] AS [Table Name],
 		ps.object_id,
@@ -42,7 +43,29 @@ FROM
 				END	AS data_pages
 				FROM sys.dm_db_partition_stats ps
 		) sub_ps ON ps.partition_id = sub_ps.partition_id
-UNION
+	UNION
+	-- User Views
+	SELECT sch.[name] + N'.' + v.[name] AS [Table Name],
+			ps.object_id,
+			ps.index_id,
+			ps.reserved_page_count,
+			sub_ps.data_pages,
+			ps.used_page_count,
+			ps.row_count
+	FROM sys.dm_db_partition_stats ps
+			INNER JOIN sys.views v ON ps.object_id = v.object_id
+			INNER JOIN sys.schemas sch ON v.schema_id = sch.schema_id
+			INNER JOIN 
+			(
+				SELECT partition_id, 
+					CASE
+						WHEN (ps.index_id < 2) THEN (ps.in_row_data_page_count + ps.lob_used_page_count + ps.row_overflow_used_page_count)
+						ELSE ps.lob_used_page_count + ps.row_overflow_used_page_count
+					END	AS data_pages
+					FROM sys.dm_db_partition_stats ps
+			) sub_ps ON ps.partition_id = sub_ps.partition_id
+	UNION
+	-- Internal tables
 	SELECT
 		sch.[name] + N'.' + t.[name] AS [Table Name], 
 		it.parent_id AS object_id,
