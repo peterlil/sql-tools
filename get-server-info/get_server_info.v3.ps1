@@ -519,6 +519,23 @@ if($dbName.Length -eq 0) {
 
 $sqlServerVersion = 'unknown';
 
+Write-Host "Quering for version path" -ForegroundColor Green;
+$version = invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT @@VERSION AS Version"
+if ( $version.version.Contains( "Microsoft SQL Server 2008" ) ) {
+    $sqlServerVersion='100'
+} elseif ( $version.version.Contains( "Microsoft SQL Server 2012" ) ) {
+    $sqlServerVersion='110'
+} elseif ( $version.version.Contains( "Microsoft SQL Server 2014" ) ) {
+    $sqlServerVersion='120'
+} elseif ( $version.version.Contains( "Microsoft SQL Server 2016" ) ) {
+    $sqlServerVersion='130'
+} elseif ( $version.version.Contains( "Microsoft SQL Server 2017" ) ) {
+    $sqlServerVersion='140'
+} elseif ( $version.version.Contains( "Microsoft SQL Server 2019" ) ) {
+    $sqlServerVersion='150'
+}
+
+
 if($skipDatabaseQueries -eq $false) {
 	$snapIns = Get-PSSnapin -Name *SQL* -ErrorAction "SilentlyContinue"
 	if($snapIns.Length -lt 2) {
@@ -561,14 +578,12 @@ if($skipDatabaseQueries -eq $false) {
 				Update-TypeData -PrependPath SQLProvider.Types.ps1xml 
 				update-FormatData -prependpath SQLProvider.Format.ps1xml 
 				Pop-Location
-				$sqlServerVersion='100';
 			}
 		}
 		else
 		{
 			import-module sqlps -DisableNameChecking
 			C:
-			$sqlServerVersion='110';
 		}
 
 	}
@@ -658,13 +673,11 @@ if($skipDatabaseQueries -eq $false) {
 
 	Write-Host "Sending query transaction-log-fragment-report-alternative.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_vlf-report.txt"
-	if( $sqlServerVersion -eq "110") `
-	{
-		$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "Transaction-log-fragment-report-altenative_110.sql"));
-	}
-	else `
-	{
+	
+    if( $sqlServerVersion -eq "100") {
 		$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "Transaction-log-fragment-report-altenative.sql"));
+    } else {
+		$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "Transaction-log-fragment-report-altenative_110.sql"));
 	}
 	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
@@ -673,7 +686,7 @@ if($skipDatabaseQueries -eq $false) {
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "check running traceflags.sql"));
 	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
-	Write-Host "Sending query database-sized.sql." -ForegroundColor Green;
+	Write-Host "Sending query database-sizes.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_database-sizes.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "database sizes.sql"));
 	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
