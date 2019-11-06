@@ -1,0 +1,107 @@
+// Check cpu (vCore)
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+//| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in ("cpu_percent", "cpu_limit", "cpu_used", "workers_percent")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+// Check DTU usage (DTU)
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+//| where TimeGenerated  > datetime("2019-10-25T09:50:00") and TimeGenerated  < datetime("2019-10-25T17:00:00")
+| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in ("dtu_limit", "dtu_consumption_percent", "dtu_used" )
+//| where MetricName in ("dtu_limit")
+//| where MetricName in ("dtu_consumption_percent")
+//| where MetricName in ("dtu_used")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+
+// Absolut storage numbers
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+//| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in (
+    "Storage",
+    "allocated_data_storage")
+| project TimeGenerated, MetricName, Maximum  //, AllocatedDataStorageInMB
+| render timechart
+
+
+// Check data allocation percentage
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+//| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in (
+    "storage_percent", 
+    "tempdb_log_used_percent",
+    "xtp_storage_percent")
+| project TimeGenerated, MetricName, Maximum  //, AllocatedDataStorageInMB
+| render timechart
+
+
+// No good stats for memory yet
+
+// Check to see if connections are healthy
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+//| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in ("connection_successful", "connection_fail")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+// Sessions
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+//| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in ("sessions_percent")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+// Deadlocks
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+//| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in ("deadlock")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+
+
+// (I/O) Check log writes
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+//| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where TimeGenerated > ago(1d) // Relative time
+| where MetricName in ("log_write_percent")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+
+// (I/O) Check physical data read percent
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+//| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where TimeGenerated > ago(5h) // Relative time
+| where MetricName in ("physical_data_read_percent")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+
+// Check current sessions
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where MetricName in ("sessions_percent")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
+
+
