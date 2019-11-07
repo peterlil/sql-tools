@@ -1,3 +1,79 @@
+--<<<<<<<<<<----------------------------------------------------------------->>>>>>>>>>--
+--DMV_All-Stars.sql
+    --Jimmy May 317.590.8650
+    --A.C.E. Performance Team
+    --jimmymay@microsoft.com
+    --aspiringgeek@live.com
+    --http://blogs.msdn.com/jimmymay
+--Table of Contents
+--1. expensive queries
+--2. wait stats
+--3. virtual file stats (& virtual file latency)
+--4. plan cache interrogation
+--5. real-time blockers
+--<<<<<<<<<<----------------------------------------------------------------->>>>>>>>>>--
+--Weasel Clause: This script is provided "AS IS" with no warranties, and confers no rights. 
+--  Use of included script samples are subject to the terms specified at 
+--  http://www.microsoft.com/info/cpyright.htm
+--<<<<<<<<<<----------------------------------------------------------------->>>>>>>>>>--
+
+--1. expensive queries
+    --text *and* statement
+    --usage: modify WHERE & ORDER BY clauses to suit circumstances
+SELECT --TOP 10
+      -- the following four columns are NULL for ad hoc and prepared batches
+      DB_Name(qp.dbid) as dbname , qp.dbid , qp.objectid , qp.number 
+    --, qp.query_plan --the query plan can be *very* useful; enable if desired
+    , qs.creation_time , qs.last_execution_time , qs.execution_count 
+    , qs.total_worker_time    / qs.execution_count as avg_worker_time
+    , qs.total_physical_reads / qs.execution_count as avg_physical_reads 
+    , qs.total_logical_reads  / qs.execution_count as avg_logical_reads 
+    , qs.total_logical_writes / qs.execution_count as avg_logical_writes 
+    , qs.total_elapsed_time   / qs.execution_count as avg_elapsed_time 
+    , qs.total_clr_time       / qs.execution_count as avg_clr_time
+    , qs.total_worker_time , qs.last_worker_time , qs.min_worker_time , qs.max_worker_time 
+    , qs.total_physical_reads , qs.last_physical_reads , qs.min_physical_reads , qs.max_physical_reads 
+    , qs.total_logical_reads , qs.last_logical_reads , qs.min_logical_reads , qs.max_logical_reads 
+    , qs.total_logical_writes , qs.last_logical_writes , qs.min_logical_writes , qs.max_logical_writes 
+    , qs.total_elapsed_time , qs.last_elapsed_time , qs.min_elapsed_time , qs.max_elapsed_time
+    , qs.total_clr_time , qs.last_clr_time , qs.min_clr_time , qs.max_clr_time 
+    --, qs.sql_handle , qs.statement_start_offset , qs.statement_end_offset 
+    , qs.plan_generation_num, qs.query_hash  -- , qp.encrypted 
+    , REPLACE(REPLACE(REPLACE(SUBSTRING(qt.text, (qs.statement_start_offset/2) + 1,
+        ((CASE statement_end_offset 
+            WHEN -1 THEN DATALENGTH(qt.text)
+            ELSE qs.statement_end_offset END 
+                - qs.statement_start_offset)/2) + 1), CHAR(10), ' '), CHAR(13), ''), CHAR(9), ' ') as statement_text
+    , REPLACE(REPLACE(REPLACE(qt.text, CHAR(10), ' '), CHAR(13), ''), CHAR(9), ' ') AS [text]
+    FROM sys.dm_exec_query_stats as qs 
+    CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) as qp
+    CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) as qt
+    --WHERE...
+    --ORDER BY qs.execution_count      DESC  --Frequency
+      ORDER BY qs.total_worker_time    DESC  --CPU
+    --ORDER BY qs.total_elapsed_time   DESC  --Durn
+    --ORDER BY qs.total_logical_reads  DESC  --Reads 
+    --ORDER BY qs.total_logical_writes DESC  --Writes
+    --ORDER BY qs.total_physical_reads DESC  --PhysicalReads    
+    --ORDER BY avg_worker_time         DESC  --AvgCPU
+    --ORDER BY avg_elapsed_time        DESC  --AvgDurn     
+    --ORDER BY avg_logical_reads       DESC  --AvgReads
+    --ORDER BY avg_logical_writes      DESC  --AvgWrites
+    --ORDER BY avg_physical_reads      DESC  --AvgPhysicalReads
+
+    --sample WHERE clauses
+    --WHERE last_execution_time > '20070507 15:00'
+    --WHERE execution_count = 1
+    --  WHERE SUBSTRING(qt.text, (qs.statement_start_offset/2) + 1,
+    --    ((CASE statement_end_offset 
+    --        WHEN -1 THEN DATALENGTH(qt.text)
+    --        ELSE qs.statement_end_offset END 
+    --            - qs.statement_start_offset)/2) + 1)
+    --      LIKE '%MyText%'
+
+
+
+
 -- Execute in master database 
 -- Get utilization in last 6 hours for a database 
 Declare 
