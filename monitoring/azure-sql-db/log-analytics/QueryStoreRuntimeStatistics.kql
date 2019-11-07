@@ -1,0 +1,31 @@
+// QueryStoreRuntimeStatistics --  Basic query
+AzureDiagnostics
+| where SubscriptionId == "05c25b78-003c-49ef-8f02-b24ca4aca086"
+    and ResourceType == "SERVERS/DATABASES" 
+    and Category == "QueryStoreRuntimeStatistics"
+    and LogicalServerName_s == "peterlilsql"
+    and Resource == "TOYSTORE"
+    and DatabaseName_s == "toystore" 
+
+// QueryStoreRuntimeStatistics -- Most used query in total
+AzureDiagnostics
+| where SubscriptionId == "05c25b78-003c-49ef-8f02-b24ca4aca086"
+    and ResourceType == "SERVERS/DATABASES" 
+    and Category == "QueryStoreRuntimeStatistics"
+    and LogicalServerName_s == "peterlilsql"
+    and Resource == "TOYSTORE"
+    and DatabaseName_s == "toystore" 
+| where TimeGenerated  > startofday(datetime("2019-10-24")) and TimeGenerated  < endofday(datetime("2019-10-24"))
+| summarize 
+    CountExecutions = sum(count_executions_d), 
+    MaxMemoryForSingleQuery = max(max_query_max_used_memory_d),
+    MaxCpuForSingleQuery = max(max_cpu_time_d),
+    CpuTimeTotal = sum(cpu_time_d),
+    DurationTotal = sum(duration_d),
+    PhysicalReads = sum(num_physical_io_reads_d),
+    LogicalReds = sum(logical_io_reads_d),
+    LogicalWrites = sum(logical_io_writes_d)
+    by query_hash_s
+| top 100 by CountExecutions desc
+
+

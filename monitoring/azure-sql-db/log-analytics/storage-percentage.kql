@@ -1,0 +1,6 @@
+// Storage Percent > 90%
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where MetricName == "storage_percent" 
+| where Maximum > 90
+| project TimeGenerated , ResourceId , MetricName , Maximum

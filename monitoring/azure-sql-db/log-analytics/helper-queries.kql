@@ -1,0 +1,31 @@
+// ===============
+// === METRICS ===
+// ===============
+
+// Check what metrics exists
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| distinct MetricName
+
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where MetricName == "sqlserver_process_memory_percent"
+
+
+// ===================
+// === DIAGNOSTICS ===
+// ===================
+
+// List what resource types that are logged
+AzureDiagnostics
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| distinct ResourceType
+
+// List all categories
+AzureDiagnostics
+| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| distinct Category
+
+

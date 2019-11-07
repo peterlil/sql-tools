@@ -1,0 +1,10 @@
+// Deadlocks > 1
+AzureMetrics
+| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where MetricName == "deadlock"  and Maximum > 0
+| project TimeGenerated , ResourceId , MetricName , Maximum
+
+
+AzureDiagnostics
+| where ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where isnotempty(deadlock_xml_s)

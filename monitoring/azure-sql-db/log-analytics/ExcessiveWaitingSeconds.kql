@@ -1,0 +1,10 @@
+
+
+
+// Blocking and other SQL Insights metrics
+AzureDiagnostics
+| where LogicalServerName_s contains "peterlilsql" 
+| where DatabaseName_s contains "toystore" 
+| where Category contains "ExcessiveWaitingSeconds" 
+| project TimeGenerated , LogicalServerName_s , DatabaseName_s , Category 
+//, detections_s , rootCauseAnalysis_s, status_s 

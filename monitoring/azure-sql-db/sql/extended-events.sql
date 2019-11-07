@@ -75,6 +75,7 @@ ORDER BY
     se.session_source
 ;
 GO
+
 -- Parse the target xml xevent into table
 SELECT * FROM 
 (
