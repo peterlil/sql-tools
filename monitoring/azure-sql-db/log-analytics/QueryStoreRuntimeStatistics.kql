@@ -249,3 +249,4 @@ AzureDiagnostics
 //	JOIN sys.query_store_query_text qt
 //	ON q.query_text_id = qt.query_text_id 
 //WHERE q.query_hash = 0xDD7CCB218412E10A
+//
