@@ -3,14 +3,22 @@
 // ===============
 
 // Check what metrics exists
+let dtStart = ago(7d); // datetime("2019-10-24T11:00:00")
+let dtEnd = ago(6d); // datetime("2019-10-24T14:00:00")
 AzureMetrics
-| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
-| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where ResourceProvider=="MICROSOFT.SQL" 
+| where ResourceId contains "/SERVERS/" 
+| where ResourceId contains "/DATABASES/" 
+| where TimeGenerated  > dtStart and TimeGenerated  < dtEnd
 | distinct MetricName
 
+let dtStart = ago(7d);
+let dtEnd = ago(6d);
 AzureMetrics
-| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
-| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where ResourceProvider=="MICROSOFT.SQL" 
+| where ResourceId contains "/SERVERS/" 
+| where ResourceId contains "/DATABASES/" 
+| where TimeGenerated  > dtStart and TimeGenerated  < dtEnd
 | where MetricName == "sqlserver_process_memory_percent"
 
 
@@ -19,13 +27,17 @@ AzureMetrics
 // ===================
 
 // List what resource types that are logged
+let dtStart = ago(7d);
+let dtEnd = ago(6d);
 AzureDiagnostics
-| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where TimeGenerated  > dtStart and TimeGenerated  < dtEnd
 | distinct ResourceType
 
 // List all categories
+let dtStart = ago(7d);
+let dtEnd = ago(6d);
 AzureDiagnostics
-| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where TimeGenerated  > dtStart and TimeGenerated  < dtEnd
 | distinct Category
 
 

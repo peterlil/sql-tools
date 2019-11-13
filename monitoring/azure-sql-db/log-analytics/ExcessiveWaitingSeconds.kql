@@ -1,10 +1,10 @@
-
-
-
 // Blocking and other SQL Insights metrics
+let dtStart = ago(7d);
+let dtEnd = ago(6d);
+let DatabaseName = "<db name>";
 AzureDiagnostics
 | where LogicalServerName_s contains "peterlilsql" 
-| where DatabaseName_s contains "toystore" 
+| where DatabaseName_s == DatabaseName 
 | where Category contains "ExcessiveWaitingSeconds" 
 | project TimeGenerated , LogicalServerName_s , DatabaseName_s , Category 
 //, detections_s , rootCauseAnalysis_s, status_s 

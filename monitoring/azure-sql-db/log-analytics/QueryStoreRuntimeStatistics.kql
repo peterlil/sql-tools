@@ -1,11 +1,223 @@
-// QueryStoreRuntimeStatistics --  Basic query
+// Azure SQL Database metrics and diagnostics logging - https://docs.microsoft.com/en-us/azure/sql-database/sql-database-metrics-diag-logging
+// sys.query_store_wait_stats (Transact-SQL) - https://docs.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-query-store-wait-stats-transact-sql?view=sql-server-ver15
+// sys.dm_db_wait_stats (Azure SQL Database) - https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-wait-stats-azure-sql-database?view=azuresqldb-current
+
+// QueryStoreRuntimeStatistics - Query Waits
+let ServerName = "peterlilsql";
+let DatabaseName = "<dbname>";
+let dtStart = ago(6d);
+let dtEnd = ago(5d);
 AzureDiagnostics
-| where SubscriptionId == "05c25b78-003c-49ef-8f02-b24ca4aca086"
-    and ResourceType == "SERVERS/DATABASES" 
-    and Category == "QueryStoreRuntimeStatistics"
-    and LogicalServerName_s == "peterlilsql"
-    and Resource == "TOYSTORE"
-    and DatabaseName_s == "toystore" 
+| where ResourceType == "SERVERS/DATABASES" 
+    and Category in ("QueryStoreRuntimeStatistics")
+    and LogicalServerName_s == ServerName
+    and DatabaseName_s == DatabaseName 
+| extend Metric = "Duration"
+| where TimeGenerated > dtStart
+| where TimeGenerated < dtEnd
+| summarize MaxDur_S = round(max(max_duration_d)/1000000, 1), 
+    AvgDur_S = round((sum(duration_d)/sum(count_executions_d))/1000000, 1), 
+    AvgCPU_S = round((sum(cpu_time_d)/sum(count_executions_d))/1000000, 1),
+    Execs = sum(count_executions_d) by query_hash_s
+| join (
+   AzureDiagnostics
+    | where ResourceType == "SERVERS/DATABASES" 
+        and Category in ("QueryStoreWaitStatistics")
+        and LogicalServerName_s == ServerName
+        and DatabaseName_s == DatabaseName
+    | where TimeGenerated > dtStart
+    | where TimeGenerated < dtEnd
+    | summarize 
+        TotalWaitTime_S = sum(total_query_wait_time_ms_d)/1000, 
+        MaxWaitTime_S = round(max(max_query_wait_time_ms_d)/1000, 2),
+        AvgWaitTime_S = round((sum(total_query_wait_time_ms_d)/sum(count_executions_d))/1000, 2),
+        Execs = sum(count_executions_d)
+        by query_hash_s, wait_category_s
+    | join (
+        AzureDiagnostics
+            | where ResourceType == "SERVERS/DATABASES" 
+                and Category in ("QueryStoreWaitStatistics")
+                and LogicalServerName_s == ServerName
+                and DatabaseName_s == DatabaseName 
+            | where TimeGenerated > dtStart
+            | where TimeGenerated < dtEnd
+            | summarize TotalWaitTime_S = sum(total_query_wait_time_ms_d) by query_hash_s, wait_category_s 
+            | summarize TotalWaitTime_S = max(TotalWaitTime_S) by query_hash_s
+            | join (
+                AzureDiagnostics
+                | where ResourceType == "SERVERS/DATABASES" 
+                    and Category in ("QueryStoreWaitStatistics")
+                    and LogicalServerName_s == ServerName
+                    and DatabaseName_s == DatabaseName
+                | where TimeGenerated > dtStart
+                | where TimeGenerated < dtEnd
+                | summarize TotalWaitTime_S = sum(total_query_wait_time_ms_d) by query_hash_s, wait_category_s
+            ) on query_hash_s, TotalWaitTime_S
+        ) on query_hash_s, wait_category_s
+        | project query_hash_s, DominantWait=wait_category_s, MaxWaitTime_S , AvgWaitTime_S, TotalWaitTime_S  
+    ) on query_hash_s 
+| sort by AvgDur_S desc
+| extend Metric="Duration"
+| project query_hash_s, Metric, MaxDur_S, AvgDur_S, AvgCPU_S, DominantWait, MaxWaitTime_S, AvgWaitTime_S, Execs , TotalWaitTime_S 
+
+
+// DatabaseWaitStatistics - Top interesting waits (todo)
+let ServerName = "peterlilsql";
+let DatabaseName = "<dbname>";
+let dtStart = ago(7d);
+let dtEnd = ago(0d);
+AzureDiagnostics
+| where ResourceType == "SERVERS/DATABASES" 
+    and Category in ("DatabaseWaitStatistics")
+    and LogicalServerName_s == ServerName
+    and DatabaseName_s == DatabaseName 
+| where TimeGenerated > dtStart
+| where TimeGenerated < dtEnd
+| summarize TotalWaitTime = sum(delta_wait_time_ms_d) by wait_type_s
+| sort by TotalWaitTime desc
+
+// Reference
+// interval_start_time_d: Start datetimeoffset of the interval in number of ticks from 1900-1-1. 
+
+// Duration per 30 mins
+let ServerName = "peterlilsql";
+let DatabaseName = "<dbname>";
+let dtStart = ago(7d);
+let dtEnd = ago(0d);
+AzureDiagnostics
+| where ResourceType == "SERVERS/DATABASES" 
+    and Category=="QueryStoreRuntimeStatistics"
+    and LogicalServerName_s == ServerName
+    and DatabaseName_s == DatabaseName 
+| extend interval_start_time_date = round(interval_start_time_d / 4294967296, 0)                                                        // Get only the date part
+| extend interval_start_time_time = interval_start_time_d - 4294967296 * interval_start_time_date                                       // Get only the time part
+| extend interval_start_t = datetime(1900-1-1) + time(1d) * interval_start_time_date + time(1s) * (interval_start_time_time / 300.0)    // Get the start time of the interval as datetime
+| where TimeGenerated > dtStart and TimeGenerated < dtEnd
+| summarize avg_duration = sum(duration_d)/sum(count_executions_d)/1000000, avg_cpu = sum(cpu_time_d)/sum(count_executions_d)/1000000     by bin(interval_start_t, 30m)
+| render timechart
+
+// QueryStoreRuntimeStatistics --  Basic query
+let ServerName = "peterlilsql";
+let DatabaseName = "<dbname>";
+let dtStart = ago(7d);
+let dtEnd = ago(0d);
+AzureDiagnostics
+| where ResourceType == "SERVERS/DATABASES" 
+    and Category=="QueryStoreRuntimeStatistics"
+    and LogicalServerName_s == ServerName
+    and DatabaseName_s == DatabaseName 
+| extend Metric = "Duration"
+| where TimeGenerated > dtStart and TimeGenerated < dtEnd
+
+
+// QueryStoreRuntimeStatistics -- Duration
+let ServerName = "peterlilsql";
+let DatabaseName = "<dbname>";
+let dtStart = ago(7d);
+let dtEnd = ago(0d);
+AzureDiagnostics
+| where ResourceType == "SERVERS/DATABASES" 
+    and Category=="QueryStoreRuntimeStatistics"
+    and LogicalServerName_s == ServerName
+    and DatabaseName_s == DatabaseName 
+| extend Metric = "Duration"
+| where TimeGenerated > dtStart and TimeGenerated < dtEnd
+| summarize MaxDur_S = round(max(max_duration_d)/1000000, 1), 
+    AvgDur_S = round((sum(duration_d)/sum(count_executions_d))/1000000, 1), 
+    AvgCPU_S = round((sum(cpu_time_d)/sum(count_executions_d))/1000000, 1),
+    Execs = sum(count_executions_d) by query_hash_s
+| sort by AvgDur_S desc
+
+let ServerName = "peterlilsql";
+let DatabaseName = "<dbname>";
+let dtStart = ago(7d);
+let dtEnd = ago(0d);
+AzureDiagnostics
+| where ResourceType == "SERVERS/DATABASES" 
+    and Category in ("QueryStoreWaitStatistics")
+    and Category=="QueryStoreRuntimeStatistics"
+    and LogicalServerName_s == ServerName
+    and DatabaseName_s == DatabaseName 
+| where TimeGenerated > dtStart and TimeGenerated < dtEnd
+| summarize 
+    TotalWaitTime_S = sum(total_query_wait_time_ms_d)/1000, 
+    MaxWaitTime_S = max(max_query_wait_time_ms_d)/1000,
+    AvgWaitTime_S = (sum(total_query_wait_time_ms_d)/sum(count_executions_d))/1000,
+    Execs = sum(count_executions_d)
+    by query_hash_s, wait_category_s
+| sort by TotalWaitTime_S desc
+| take 1 
+
+
+
+
+// QueryStoreWaitStatistics - 
+let ServerName = "peterlilsql";
+let DatabaseName = "<dbname>";
+let dtStart = ago(7d);
+let dtEnd = ago(0d);
+AzureDiagnostics
+| where ResourceType == "SERVERS/DATABASES" 
+    and Category in ("QueryStoreWaitStatistics")
+    and Category=="QueryStoreRuntimeStatistics"
+    and LogicalServerName_s == ServerName
+    and DatabaseName_s == DatabaseName 
+| where TimeGenerated > dtStart and TimeGenerated < dtEnd
+| summarize 
+    TotalWaitTime_S = sum(total_query_wait_time_ms_d)/1000, 
+    MaxWaitTime_S = max(max_query_wait_time_ms_d)/1000,
+    AvgWaitTime_S = (sum(total_query_wait_time_ms_d)/sum(count_executions_d))/1000,
+    Execs = sum(count_executions_d)
+    by query_hash_s, wait_category_s
+| join (
+    AzureDiagnostics
+        | where ResourceType == "SERVERS/DATABASES" 
+            and Category in ("QueryStoreWaitStatistics")
+            and Category=="QueryStoreRuntimeStatistics"
+            and LogicalServerName_s == ServerName
+            and DatabaseName_s == DatabaseName 
+        | where TimeGenerated > dtStart and TimeGenerated < dtEnd
+        | summarize TotalWaitTime_S = sum(total_query_wait_time_ms_d) by query_hash_s, wait_category_s 
+        | summarize TotalWaitTime_S = max(TotalWaitTime_S) by query_hash_s
+        | join (
+            AzureDiagnostics
+            | where ResourceType == "SERVERS/DATABASES" 
+                and Category in ("QueryStoreWaitStatistics")
+                and Category=="QueryStoreRuntimeStatistics"
+                and LogicalServerName_s == ServerName
+                and DatabaseName_s == DatabaseName 
+            | where TimeGenerated > dtStart and TimeGenerated < dtEnd
+            | summarize TotalWaitTime_S = sum(total_query_wait_time_ms_d) by query_hash_s, wait_category_s
+        ) on query_hash_s, TotalWaitTime_S
+) on query_hash_s, wait_category_s
+//| where query_hash_s == "0x9912DC2F4CBFE51E"
+| project query_hash_s, DominantWait=wait_category_s, MaxWaitTime_S , AvgWaitTime_S , Execs 
+
+
+
+
+// Need to find highest waits on database scope
+
+
+
+
+
+
+
+
+
+
+// Check Duration
+AzureDiagnostics
+| where ResourceProvider=="MICROSOFT.SQL" 
+| where ResourceId contains "/SERVERS/" 
+| where ResourceId contains "/DATABASES/" 
+//| where TimeGenerated  > datetime("2019-10-24T11:00:00") and TimeGenerated  < datetime("2019-10-24T14:00:00")
+| where TimeGenerated > ago(6d)
+| where TimeGenerated < ago(5d)
+| where MetricName in ("cpu_percent", "cpu_limit", "cpu_used", "workers_percent")
+| project TimeGenerated, MetricName, Maximum 
+| render timechart
 
 // QueryStoreRuntimeStatistics -- Most used query in total
 AzureDiagnostics
@@ -29,3 +241,11 @@ AzureDiagnostics
 | top 100 by CountExecutions desc
 
 
+
+
+// Get the query from a hash
+//SELECT qt.query_sql_text query_text, q.query_hash
+//FROM sys.query_store_query q 
+//	JOIN sys.query_store_query_text qt
+//	ON q.query_text_id = qt.query_text_id 
+//WHERE q.query_hash = 0xDD7CCB218412E10A

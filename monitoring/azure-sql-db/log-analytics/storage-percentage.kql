@@ -1,6 +1,12 @@
 // Storage Percent > 90%
+let dtStart = ago(7d);
+let dtEnd = ago(6d);
+let DatabaseNameInResourceId = "/<DBNAME>";
 AzureMetrics
-| where _ResourceId contains "/SUBSCRIPTIONS/05C25B78-003C-49EF-8F02-B24CA4ACA086/RESOURCEGROUPS/SQL/PROVIDERS/MICROSOFT.SQL/SERVERS/PETERLILSQL/DATABASES/TOYSTORE"
+| where ResourceProvider=="MICROSOFT.SQL" 
+| where ResourceId contains "/SERVERS/" 
+| where ResourceId contains "/DATABASES/" 
+| where ResourceId contains DatabaseNameInResourceId 
 | where MetricName == "storage_percent" 
 | where Maximum > 90
 | project TimeGenerated , ResourceId , MetricName , Maximum
