@@ -138,35 +138,17 @@ GO
 -- Create an extended event session with a ring buffer
 -- Works with Azure SQL Database Managed Instance
 
-CREATE EVENT SESSION [Query performance trace] ON SERVER 
+CREATE EVENT SESSION [Query performance trace 2] ON SERVER 
 ADD EVENT sqlserver.rpc_completed(
     ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash)
-    WHERE ([object_name]<>N'sp_reset_connection')),
-ADD EVENT sqlserver.databases_bulk_insert_rows(
-    ACTION(sqlserver.query_hash,sqlserver.query_plan_hash)), 
+    WHERE ((([sqlserver].[not_equal_i_sql_unicode_string]([object_name],N'sp_reset_connection')) AND ([package0].[greater_than_equal_uint64]([duration],(120000000)))) AND ([sqlserver].[database_id]<>(1)))), 
 ADD EVENT sqlserver.sql_batch_completed(SET collect_batch_text=(1)
     ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.sql_text)
-    WHERE ([duration]>=(30000000))), 
+    WHERE (([package0].[greater_than_equal_uint64]([duration],(120000000))) AND ([sqlserver].[database_id]<>(1)))), 
 ADD EVENT sqlserver.sql_statement_completed(
     ACTION(sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.execution_plan_guid,sqlserver.nt_username,sqlserver.num_response_rows,sqlserver.plan_handle,sqlserver.query_hash,sqlserver.query_plan_hash,sqlserver.sql_text)
-    WHERE ([duration]>=(30000000)))
-ADD TARGET package0.ring_buffer(SET max_memory=(512000))
-GO
-
-
-
--- ### sqlserver.statement_starting ? ending ?
-CREATE 
-	EVENT SESSION [Performance Test Trace] ON DATABSE 
-ADD EVENT sqlserver.databases_bulk_insert_rows(
-    ACTION(sqlserver.query_hash,sqlserver.query_plan_hash)),
-ADD EVENT sqlserver.rpc_completed(SET collect_statement=(1)
-    ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash)
-    WHERE ([object_name]<>N'sp_reset_connection')),
-ADD EVENT sqlserver.sql_batch_completed(SET collect_batch_text=(1)
-    ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash)) 
-ADD TARGET package0.ring_buffer (SET max_memory=500)
-WITH (MAX_MEMORY=2048 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=10 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=OFF)
+    WHERE (([package0].[greater_than_equal_int64]([duration],(60000000))) AND ([sqlserver].[database_id]<>(1))))
+ADD TARGET package0.ring_buffer(SET max_events_limit=(0),max_memory=(512000))
 GO
 
 

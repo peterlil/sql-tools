@@ -1,6 +1,6 @@
--- Credit goes to Hannah Vernon - https://www.sqlserverscience.com/extended-events/reading-the-ring-buffer-target/
+-- Partial credit goes to Hannah Vernon. Thanks! - https://www.sqlserverscience.com/extended-events/reading-the-ring-buffer-target/
 
-DECLARE @ExtendedEventsSessionName sysname = N'<session_name_here>';
+DECLARE @ExtendedEventsSessionName sysname = N'Query performance trace 2';
 DECLARE @StartTime datetimeoffset;
 DECLARE @EndTime datetimeoffset;
 DECLARE @Offset int;
@@ -12,7 +12,7 @@ CREATE TABLE #xmlResults
     , xeXML XML NOT NULL
 );
  
-SET @StartTime = DATEADD(HOUR, -4, GETDATE()); --modify this to suit your needs
+SET @StartTime = DATEADD(HOUR, -60, GETDATE()); --modify this to suit your needs
 SET @EndTime = GETDATE();
 SET @Offset = DATEDIFF(MINUTE, GETDATE(), GETUTCDATE());
 SET @StartTime = DATEADD(MINUTE, @Offset, @StartTime);
@@ -42,8 +42,21 @@ SELECT src.xeXML
 FROM src;
  
 SELECT [TimeStamp] = CONVERT(varchar(30), DATEADD(MINUTE, 0 - @Offset, xr.xeTimeStamp), 120)
+	, xr.xeXML.value('(/event/@name)[1]', 'varchar(max)') AS [event]
+	, xr.xeXML.value('(/event/@timestamp)[1]', 'varchar(max)') AS [timestamp] 
+	, xr.xeXML.value('(/event/action[@name="database_id"]/value)[1]', 'int') AS [database_id]
+	, xr.xeXML.value('(/event/action[@name="database_name"]/value)[1]', 'sysname') AS [database_name]
+	, xr.xeXML.value('(/event/data[@name="duration"]/value)[1]', 'bigint')/1000 AS [duration_ms]
+	, xr.xeXML.value('(/event/data[@name="cpu_time"]/value)[1]', 'bigint')/1000 AS [cpu_time_ms]
+	, xr.xeXML.value('(/event/data[@name="logical_reads"]/value)[1]', 'bigint') AS [logical_reads]
+	, xr.xeXML.value('(/event/data[@name="writes"]/value)[1]', 'bigint') AS [writes]
+	, xr.xeXML.value('(/event/data[@name="row_count"]/value)[1]', 'bigint') AS [row_count]
+	, xr.xeXML.value('(/event/data[@name="statement"]/value)[1]', 'varchar(max)') AS [statement]
+	, xr.xeXML.value('(/event/action[@name="client_app_name"]/value)[1]', 'varchar(100)') AS [client_app_name]
+	, xr.xeXML.value('(/event/action[@name="client_hostname"]/value)[1]', 'varchar(100)') AS [client_hostname]
+	, xr.xeXML.value('(/event/action[@name="nt_username"]/value)[1]', 'sysname') AS [nt_username]
     , xr.xeXML
 FROM #xmlResults xr
 WHERE xr.xeTimeStamp >= @StartTime
     AND xr.xeTimeStamp<= @EndTime
-ORDER BY xr.xeTimeStamp;
+ORDER BY duration_ms DESC;
