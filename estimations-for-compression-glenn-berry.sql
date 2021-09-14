@@ -10,7 +10,7 @@
 -- Get estimated data compression savings and other index info for every index in the specified table
 SET NOCOUNT ON;
 DECLARE @SchemaName sysname = N'dbo';                                -- Specify schema name
-DECLARE @TableName sysname = N'Item';                        -- Specify table name
+DECLARE @TableName sysname = N'<table>';                        -- Specify table name
 DECLARE @FullName sysname = @SchemaName + '.' + @TableName;
 DECLARE @IndexID int = 1;
 DECLARE @CompressionType nvarchar(60) = N'PAGE';                    -- Specify desired data compression type (PAGE, ROW, or NONE)
