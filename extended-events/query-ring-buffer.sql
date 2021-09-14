@@ -11,18 +11,19 @@ CREATE TABLE #xmlResults
       xeTimeStamp datetimeoffset NOT NULL
     , xeXML XML NOT NULL
 );
- 
+
+/*
 SET @StartTime = DATEADD(HOUR, -60, GETDATE()); --modify this to suit your needs
 SET @EndTime = GETDATE();
 SET @Offset = DATEDIFF(MINUTE, GETDATE(), GETUTCDATE());
 SET @StartTime = DATEADD(MINUTE, @Offset, @StartTime);
 SET @EndTime = DATEADD(MINUTE, @Offset, @EndTime);
- 
+
 SELECT StartTimeUTC = CONVERT(varchar(30), @StartTime, 127)
     , StartTimeLocal = CONVERT(varchar(30), DATEADD(MINUTE, 0 - @Offset, @StartTime), 120)
     , EndTimeUTC = CONVERT(varchar(30), @EndTime, 127)
     , EndTimeLocal = CONVERT(varchar(30), DATEADD(MINUTE, 0 - @Offset, @EndTime), 120);
- 
+*/ 
 DECLARE @target_data xml;
 SELECT @target_data = CONVERT(xml, target_data)
 FROM sys.dm_xe_sessions AS s 
@@ -57,6 +58,15 @@ SELECT [TimeStamp] = CONVERT(varchar(30), DATEADD(MINUTE, 0 - @Offset, xr.xeTime
 	, xr.xeXML.value('(/event/action[@name="nt_username"]/value)[1]', 'sysname') AS [nt_username]
     , xr.xeXML
 FROM #xmlResults xr
-WHERE xr.xeTimeStamp >= @StartTime
-    AND xr.xeTimeStamp<= @EndTime
-ORDER BY duration_ms DESC;
+/*WHERE xr.xeTimeStamp >= @StartTime
+    AND xr.xeTimeStamp<= @EndTime*/
+--ORDER BY duration_ms DESC;
+ORDER BY xr.xeXML.value('(/event/@timestamp)[1]', 'varchar(max)') DESC;
+
+
+
+
+
+
+
+
