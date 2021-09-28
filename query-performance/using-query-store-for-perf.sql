@@ -10,6 +10,14 @@
 SELECT * 
 FROM sys.database_query_store_options
 
+/*
+ * Get the SQL Statement from the Query Hash
+ */
+SELECT q.query_id, qt.query_sql_text, q.* 
+FROM sys.query_store_query q
+INNER JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
+WHERE q.query_hash = 0x301C509A005A2CF8
+ORDER BY q.last_execution_time DESC
 
 /*
  * Use this query to:
