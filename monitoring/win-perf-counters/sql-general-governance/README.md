@@ -33,7 +33,7 @@ Unblock-File .\Make-PerfmonTemplate.ps1
 ```
 6. Type `.\Make-PerfmonTemplate.ps1 -Template perfmon-template-w10-basic.xml` and press _Enter_.
 7. Start _Performance Monitor_.
-8. Right click _Performance->Data Collector Sets->User Defined and select New->Data Collector Set_.
+8. Right click _Performance->Data Collector Sets->User Defined_ and select _New->Data Collector Set_.
 9. Type _Windows 10 basic trace_ as Name and select _Create from a template_ and click _Next_.
 10. Click _Browse…_.
 11. Browse for _`_[computer name]-PerfmonTemplate.xml_ and click Open.
