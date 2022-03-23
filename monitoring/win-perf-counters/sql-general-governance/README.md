@@ -4,15 +4,19 @@
 
 With basic performance monitoring I mean processes, CPU, disk, memory and network.
 
-### 1. Extract all files 
+### 1. Download the zip-file
+Download the latest zip file. They are named _Monitoring.v[x].zip_.
+At the time of writing [Monitoring.v3.zip](/sql-general-governance/Monitoring.v3.zip) is the latest one.
+
+### 2. Extract all files 
 
 Extract all files in the zip archive(Monitoring.v3.zip) to a folder, for example `C:\temp`.
 
-### 2. _Optional_ Change sampling interval
+### 3. _Optional_ Change sampling interval
 
 If you need to change counter sampling interval -> open the file `perfmon-template-w10-basic.xml` in a text editor and find `<SampleInterval>5</SampleInterval>` and adjust it accordingly. The value is in seconds.
 
-### 3. _Optional_ Change trace file destination
+### 4. _Optional_ Change trace file destination
 
 If you need to change destination of the trace files, the following paths need to and can be changed (it defaults to `C:\PerfLogs\*`). Otherwise, skip this step.:
 
@@ -21,7 +25,7 @@ If you need to change destination of the trace files, the following paths need t
 3. Remove old logs - Scheduled Task.xml, line 44 (_Arguments_)
 4. Zip Perfmon Logs - Scheduled Task.xml, line 44 (_Arguments_)
 
-### 4. Prepare the perfmon template
+### 5. Prepare the perfmon template
 
 1. Start PowerShell as Administrator.
 2. Type `cd C:\temp` (or wherever you unzipped the file) and press Enter.
@@ -41,7 +45,7 @@ Unblock-File .\Make-PerfmonTemplate.ps1
 
 Now you have a trace definition under _User Defined_, which you can manually start and stop when needed.
 
-### 5. _Optional_ If you want to have the trace to run continuously, then perform this additional step
+### 6. _Optional_ If you want to have the trace to run continuously, then perform this additional step
 
 1. You probably also need to unblock these scripts
 ```powershell
