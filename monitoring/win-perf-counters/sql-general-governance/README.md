@@ -39,6 +39,8 @@ Unblock-File .\Make-PerfmonTemplate.ps1
 11. Browse for _[computer name]-PerfmonTemplate.xml_ and click Open.
 12. Click _Finish_.
 
+Now you have a trace definition under _User Defined_, which you can manually start and stop when needed.
+
 ### 5. _Optional_ If you want to have the trace to run continuously, then perform this additional step
 
 1. You probably also need to unblock these scripts
