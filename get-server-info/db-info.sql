@@ -1,3 +1,5 @@
+-- Not supported on Azure SQL DB
+
 SET NOCOUNT ON
 
 DECLARE @dbname sysname

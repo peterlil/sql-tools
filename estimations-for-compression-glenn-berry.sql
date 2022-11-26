@@ -29,16 +29,14 @@ ORDER BY SUM(Rows) DESC;
 -- Breaks down buffers used by current table in this database by object (table, index) in the buffer pool
 -- Shows you which indexes are taking the most space in the buffer cache, so they might be possible candidates for data compression
 SELECT OBJECT_NAME(p.[object_id]) AS [Object Name],
-p.index_id, COUNT(*)/128 AS [Buffer size(MB)],  COUNT(*) AS [Buffer Count], 
-p.data_compression_desc AS [Compression Type]
+	p.index_id, COUNT(*)/128 AS [Buffer size(MB)],  COUNT(*) AS [Buffer Count], 
+	p.data_compression_desc AS [Compression Type]
 FROM sys.allocation_units AS a WITH (NOLOCK)
-INNER JOIN sys.dm_os_buffer_descriptors AS b WITH (NOLOCK)
-ON a.allocation_unit_id = b.allocation_unit_id
-INNER JOIN sys.partitions AS p WITH (NOLOCK)
-ON a.container_id = p.hobt_id
+	INNER JOIN sys.dm_os_buffer_descriptors AS b WITH (NOLOCK) ON a.allocation_unit_id = b.allocation_unit_id
+	INNER JOIN sys.partitions AS p WITH (NOLOCK) ON a.container_id = p.hobt_id
 WHERE b.database_id = DB_ID()
-AND OBJECT_NAME(p.[object_id]) = @TableName
-AND p.[object_id] > 100
+	AND OBJECT_NAME(p.[object_id]) = @TableName
+	AND p.[object_id] > 100
 GROUP BY p.[object_id], p.index_id, p.data_compression_desc
 ORDER BY [Buffer Count] DESC;
  
@@ -48,10 +46,9 @@ FOR
     -- Get list of index IDs for this table
     SELECT i.index_id
     FROM sys.indexes AS i WITH (NOLOCK)
-    INNER JOIN sys.tables AS t WITH (NOLOCK)
-    ON i.[object_id] = t.[object_id]
+		INNER JOIN sys.tables AS t WITH (NOLOCK) ON i.[object_id] = t.[object_id]
     WHERE t.type_desc = N'USER_TABLE'
-    AND OBJECT_NAME(t.[object_id]) = @TableName
+		AND OBJECT_NAME(t.[object_id]) = @TableName
     ORDER BY i.index_id;
  
 OPEN curIndexID;
@@ -72,27 +69,25 @@ CLOSE curIndexID;
 DEALLOCATE curIndexID;
 -- Index Read/Write stats for this table
 SELECT OBJECT_NAME(s.[object_id]) AS [TableName],
-i.name AS [IndexName], i.index_id,
-SUM(user_seeks) AS [User Seeks], SUM(user_scans) AS [User Scans],
-SUM(user_lookups)AS [User Lookups],
-SUM(user_seeks + user_scans + user_lookups)AS [Total Reads],
-SUM(user_updates) AS [Total Writes]     
-FROM sys.dm_db_index_usage_stats AS s WITH (NOLOCK)
-INNER JOIN sys.indexes AS i WITH (NOLOCK)
-ON s.[object_id] = i.[object_id]
-AND i.index_id = s.index_id
+	i.name AS [IndexName], i.index_id,
+	SUM(user_seeks) AS [User Seeks], SUM(user_scans) AS [User Scans],
+	SUM(user_lookups)AS [User Lookups],
+	SUM(user_seeks + user_scans + user_lookups)AS [Total Reads],
+	SUM(user_updates) AS [Total Writes]     
+FROM sys.dm_db_index_usage_stats AS s WITH (NOLOCK) 
+	INNER JOIN sys.indexes AS i WITH (NOLOCK) ON s.[object_id] = i.[object_id] AND i.index_id = s.index_id
 WHERE OBJECTPROPERTY(s.[object_id],'IsUserTable') = 1
-AND s.database_id = DB_ID()
-AND OBJECT_NAME(s.[object_id]) = @TableName
+	AND s.database_id = DB_ID()
+	AND OBJECT_NAME(s.[object_id]) = @TableName
 GROUP BY OBJECT_NAME(s.[object_id]), i.name, i.index_id
 ORDER BY [Total Writes] DESC, [Total Reads] DESC;
 -- Get basic index information (does not include filtered indexes or included columns)
 EXEC sp_helpindex @FullName;
 -- Individual File Sizes and space available for current database  
 SELECT f.name AS [File Name] , f.physical_name AS [Physical Name],
-CAST((f.size/128.0) AS decimal(15,2)) AS [Total Size in MB],
-CAST(f.size/128.0 - CAST(FILEPROPERTY(f.name, 'SpaceUsed') AS int)/128.0 AS decimal(15,2))
-AS [Available Space In MB], [file_id], fg.name AS [Filegroup Name]
+	CAST((f.size/128.0) AS decimal(15,2)) AS [Total Size in MB],
+	CAST(f.size/128.0 - CAST(FILEPROPERTY(f.name, 'SpaceUsed') AS int)/128.0 AS decimal(15,2)) AS [Available Space In MB], 
+	[file_id], 
+	fg.name AS [Filegroup Name]
 FROM sys.database_files AS f WITH (NOLOCK)
-LEFT OUTER JOIN sys.data_spaces AS fg WITH (NOLOCK) 
-ON f.data_space_id = fg.data_space_id OPTION (RECOMPILE);
+	LEFT OUTER JOIN sys.data_spaces AS fg WITH (NOLOCK) ON f.data_space_id = fg.data_space_id OPTION (RECOMPILE);

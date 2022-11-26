@@ -1,3 +1,4 @@
+-- Not supported on Azure SQL Database
 SELECT 
 	CASE 
 		WHEN is_percent_growth = 1 THEN 

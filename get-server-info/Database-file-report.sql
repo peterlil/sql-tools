@@ -10,6 +10,7 @@ each database on the server.
 
 Does not work on:
 * Azure SQL DB Managed Instance
+* Azure SQL DB 
 
 ==============================================================*/
 

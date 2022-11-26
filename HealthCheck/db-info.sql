@@ -1,3 +1,9 @@
+/*
+Works on:
+	*
+Does not work on:
+	Azure SQL DB
+*/
 DECLARE @dbname sysname
 
 declare @exec_stmt nvarchar(625)

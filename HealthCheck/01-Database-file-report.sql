@@ -11,6 +11,9 @@ GO
 Note: The user must also be a member of the public role in 
 each database on the server.
 
+Does not work on:
+- Azure SQL Database
+
 ==============================================================*/
 
 

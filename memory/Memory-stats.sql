@@ -1,5 +1,12 @@
 
 -- Shows how much memory SQL Server is using
+
+/*
+
+Does not work with:
+	Azure SQL DB
+
+*/
 SELECT 
 	physical_memory_in_use_kb -- True memory that SQL is using (working set (heaps, e.t.c.), large pages, locked pages)
 FROM sys.dm_os_process_memory

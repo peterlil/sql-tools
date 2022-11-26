@@ -1,3 +1,5 @@
+-- Not supported on Azure SQL Database
+
 -- Database name, Database size, unallocated space, reserved, data, index_size, unused
 SET NOCOUNT ON;
 create table #stage (
