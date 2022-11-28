@@ -322,3 +322,20 @@ deallocate CursorIndex
 ```
 
 </details>
+
+## Tune based on logical reads (focus on reads)
+
+TBD.
+
+Helper code.
+
+```sql
+SET STATISTICS IO ON
+GO
+
+CHECKPOINT
+GO
+
+DBCC DROPCLEANBUFFERS
+GO
+```
