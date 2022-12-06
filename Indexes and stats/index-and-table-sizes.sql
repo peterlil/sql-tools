@@ -1,5 +1,6 @@
 DECLARE @object_name sysname;
-SET @object_name = N'dbo.Staging_Item_VariantStoppedItemInstruction'
+
+SET @object_name = N''
 
 SELECT object_name(p.object_id) AS name
 	   , i.name AS index_name
@@ -22,7 +23,22 @@ SELECT i.[name] AS IndexName
 FROM sys.dm_db_partition_stats AS s
 INNER JOIN sys.indexes AS i ON s.[object_id] = i.[object_id]
     AND s.[index_id] = i.[index_id]
-WHERE i.[name] = 'PK_Staging_Item_VariantStoppedItemInstruction'
-	OR i.[name] = 'IX_StagingItemVariantStoppedItemInstruction_1'
+WHERE i.[name] = ''
+	OR i.[name] = ''
 GROUP BY i.[name]
 ORDER BY i.[name]
+
+
+-- Check compression status of indexes and partitions
+SELECT t.[name] AS TableName, 
+	i.[name] AS IndexName, 
+	p.partition_number AS PartitionNumber,
+	p.data_compression_desc AS DataCompression,
+	i.*
+FROM sys.indexes i
+INNER JOIN sys.tables t ON i.object_id = t.object_id -- Removes indexes for system tables
+INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
+WHERE i.type_desc != 'HEAP'
+--	AND i.[name] = ''
+ORDER BY t.[name] ASC
+
