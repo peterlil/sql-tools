@@ -145,7 +145,7 @@ GO
  * Supports Azure SQL Database and Azute SQL Database Managed Instance
  */
 
-DECLARE @ExtendedEventsSessionName sysname = N'Query performance trace';
+DECLARE @ExtendedEventsSessionName sysname = N'Performance Test Trace';
 DECLARE @StartTime datetimeoffset;
 DECLARE @EndTime datetimeoffset;
 DECLARE @Offset int;
@@ -197,6 +197,7 @@ SELECT [TimeStamp] = CONVERT(varchar(30), DATEADD(MINUTE, 0 - @Offset, xr.xeTime
 	, xr.xeXML.value('(/event/data[@name="cpu_time"]/value)[1]', 'bigint')/1000 AS [cpu_time_ms]
 	, xr.xeXML.value('(/event/data[@name="logical_reads"]/value)[1]', 'bigint') AS [logical_reads]
 	, xr.xeXML.value('(/event/data[@name="writes"]/value)[1]', 'bigint') AS [writes]
+	, xr.xeXML.value('(/event/action[@name="num_response_rows"]/value)[1]', 'bigint') AS [num_response_rows]
 	, xr.xeXML.value('(/event/data[@name="row_count"]/value)[1]', 'bigint') AS [row_count]
 	, xr.xeXML.value('(/event/data[@name="statement"]/value)[1]', 'varchar(max)') AS [statement]
 	, xr.xeXML.value('(/event/action[@name="client_app_name"]/value)[1]', 'varchar(100)') AS [client_app_name]
@@ -207,6 +208,7 @@ FROM #xmlResults xr
 /*WHERE xr.xeTimeStamp >= @StartTime
     AND xr.xeTimeStamp<= @EndTime*/
 --ORDER BY duration_ms DESC;
+WHERE xr.xeXML.value('(/event/action[@name="client_app_name"]/value)[1]', 'varchar(100)') = 'actual-api'
 ORDER BY xr.xeXML.value('(/event/@timestamp)[1]', 'varchar(max)') DESC;
 
 GO
