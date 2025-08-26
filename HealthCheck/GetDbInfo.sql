@@ -1,3 +1,7 @@
+/*
+ * Create the stored procedure GetDbInfo
+ */
+
 USE [master]
 GO
 SET ANSI_NULLS ON

@@ -29,7 +29,7 @@ DECLARE @MsTempFilegroups TABLE (
 
 DECLARE @dbname sysname;
 DECLARE dbcurs CURSOR LOCAL FORWARD_ONLY DYNAMIC READ_ONLY FOR
-	SELECT name FROM sys.databases;
+	SELECT name FROM sys.databases WHERE state != 6 /* 6 = OFFLINE */;
 	
 OPEN dbcurs;
 

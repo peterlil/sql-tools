@@ -24,7 +24,7 @@ CREATE TABLE #VLF_db_total_temp (
  
 /*Declare a cursor to loop through all current databases*/
 DECLARE db_cursor CURSOR READ_ONLY
-	FOR SELECT name FROM master.dbo.sysdatabases;
+	FOR SELECT name FROM sys.databases WHERE state != 6 /* 6 = OFFLINE */;
  
 DECLARE @name sysname, @stmt varchar(40);
 
