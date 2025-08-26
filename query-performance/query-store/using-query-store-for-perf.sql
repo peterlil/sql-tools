@@ -9,19 +9,18 @@
  */
 SELECT * 
 FROM sys.database_query_store_options
+GO
 
 /*
- * Get the SQL Statement from the Query Hash
+ * Turn on query store by using this statement per db
  */
-SELECT q.query_id, qt.query_sql_text, q.* 
-FROM sys.query_store_query q
-INNER JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
-WHERE q.query_hash = 0x301C509A005A2CF8
-ORDER BY q.last_execution_time DESC
+ALTER DATABASE <database_name>
+SET QUERY_STORE = ON (OPERATION_MODE = READ_WRITE);
+GO
 
 /*
  * Use this query to:
- *   - Find the query you are after that had the long execution
+ *   - Find queries with long execution times
  */
  
 SELECT TOP 50 
@@ -31,12 +30,15 @@ SELECT TOP 50
 	, qt.query_text_id
 	, qt.query_sql_text
 	, rs.count_executions
-	--, rs.max_duration / 1000000 AS max_duration_in_seconds -- Use seconds or minutes depending on your circumstances
-	, rs.max_duration / 60000000 AS max_duration_in_minutes -- Use seconds or minutes depending on your circumstances
-	--, rs.avg_duration / 1000000 AS avg_duration_in_seconds -- Use seconds or minutes depending on your circumstances
-	, ROUND(rs.avg_duration / 60000000, 0) AS avg_duration_in_minutes -- Use seconds or minutes depending on your circumstances
-	--, ROUND(rs.min_duration / 1000000, 0) AS min_duration_in_seconds -- Use seconds or minutes depending on your circumstances
-	, rs.min_duration / 60000000 AS min_duration_in_minutes -- Use seconds or minutes depending on your circumstances
+	, rs.max_duration / 1000 AS max_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	, rs.avg_duration / 1000 AS avg_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	, ROUND(rs.min_duration / 1000, 0) AS min_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.max_duration / 1000000 AS max_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.avg_duration / 1000000 AS avg_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
+	--, ROUND(rs.min_duration / 1000000, 0) AS min_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.max_duration / 60000000 AS max_duration_in_minutes -- Use ms, seconds or minutes depending on your circumstances
+	--, ROUND(rs.avg_duration / 60000000, 0) AS avg_duration_in_minutes -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.min_duration / 60000000 AS min_duration_in_minutes -- Use ms, seconds or minutes depending on your circumstances
 	, rs.max_rowcount, ROUND(rs.avg_rowcount, 0) AS avg_rowcount, rs.min_rowcount
 	, CONVERT(nvarchar(30), rsi.start_time, 120) as rsi_start_time
 	, CONVERT(nvarchar(30), rsi.end_time, 120) as rsi_endtime
@@ -49,13 +51,14 @@ INNER JOIN sys.query_store_query q ON p.query_id = q.query_id
 INNER JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
 WHERE 
 	execution_type = 0 -- regular execution (successfully finished)
-	AND q.query_id NOT IN (4524, 1058, 1521, 6911, 140/* 1520*/) -- Add/remove query ids here narrow down to the queries you are looking for
+--	AND q.query_id NOT IN (4524, 1058, 1521, 6911, 140/* 1520*/) -- Add/remove query ids here narrow down to the queries you are looking for
 	--AND q.query_id IN (15654) -- When you found the query, comment row above and select only that query here, and you will get the list of plans for that query
-	AND rsi.start_time > DATEADD(hour, -2, GETDATE())
+	AND rsi.start_time > DATEADD(day, -7, GETDATE())
 	--AND rsi.start_time >= '2021-09-27 09:00:00.000' AND rsi.end_time <= '2021-09-27 10:00:00.000'
 ORDER BY 
-	max_duration DESC
+	rs.max_duration DESC
 	--rsi.start_time desc
+
 
 
 /*
@@ -70,17 +73,22 @@ SELECT --TOP 50
 	, qt.query_text_id
 	, qt.query_sql_text
 	, rs.count_executions
-	, ROUND(rs.avg_cpu_time / 1000000, 0) AS avg_cpu_time_sec
-	, ROUND(rs.last_cpu_time / 1000000, 0) AS last_cpu_time_sec
-	, ROUND(rs.min_cpu_time / 1000000, 0) AS min_cpu_time_sec
-	, ROUND(rs.max_cpu_time / 1000000, 0) AS max_cpu_time_sec
-	, ROUND(rs.stdev_cpu_time / 1000000, 0) AS stdev_cpu_time_sec
-	--, rs.max_duration / 1000000 AS max_duration_in_seconds -- Use seconds or minutes depending on your circumstances
-	--, rs.max_duration / 60000000 AS max_duration_in_minutes -- Use seconds or minutes depending on your circumstances
-	--, rs.avg_duration / 1000000 AS avg_duration_in_seconds -- Use seconds or minutes depending on your circumstances
-	--, ROUND(rs.avg_duration / 60000000, 0) AS avg_duration_in_minutes -- Use seconds or minutes depending on your circumstances
-	--, ROUND(rs.min_duration / 1000000, 0) AS min_duration_in_seconds -- Use seconds or minutes depending on your circumstances
-	--, rs.min_duration / 60000000 AS min_duration_in_minutes -- Use seconds or minutes depending on your circumstances
+	, ROUND(rs.avg_cpu_time / 1000, 0) AS avg_cpu_time_ms
+	, ROUND(rs.last_cpu_time / 1000, 0) AS last_cpu_time_ms
+	, ROUND(rs.min_cpu_time / 1000, 0) AS min_cpu_time_ms
+	, ROUND(rs.max_cpu_time / 1000, 0) AS max_cpu_time_ms
+	, ROUND(rs.stdev_cpu_time / 1000, 0) AS stdev_cpu_time_ms
+	--, ROUND(rs.avg_cpu_time / 1000000, 0) AS avg_cpu_time_sec         
+	--, ROUND(rs.last_cpu_time / 1000000, 0) AS last_cpu_time_sec
+	--, ROUND(rs.min_cpu_time / 1000000, 0) AS min_cpu_time_sec
+	--, ROUND(rs.max_cpu_time / 1000000, 0) AS max_cpu_time_sec
+	--, ROUND(rs.stdev_cpu_time / 1000000, 0) AS stdev_cpu_time_sec
+	, rs.max_duration / 1000000 AS max_duration_in_seconds			-- Use ms, seconds or minutes depending on your circumstances
+	--, rs.max_duration / 60000000 AS max_duration_in_minutes			-- Use ms, seconds or minutes depending on your circumstances
+	, rs.avg_duration / 1000000 AS avg_duration_in_seconds			-- Use ms, seconds or minutes depending on your circumstances
+	--, ROUND(rs.avg_duration / 60000000, 0) AS avg_duration_in_minutes -- Use ms, seconds or minutes depending on your circumstances
+	, ROUND(rs.min_duration / 1000000, 0) AS min_duration_in_seconds  -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.min_duration / 60000000 AS min_duration_in_minutes           -- Use ms, seconds or minutes depending on your circumstances
 	, rs.max_rowcount, ROUND(rs.avg_rowcount, 0) AS avg_rowcount, rs.min_rowcount
 	, CONVERT(nvarchar(30), rsi.start_time, 120) as rsi_start_time
 	, CONVERT(nvarchar(30), rsi.end_time, 120) as rsi_endtime
@@ -95,14 +103,14 @@ WHERE
 	--execution_type = 0 -- regular execution (successfully finished)
 	--AND q.query_id NOT IN (4524, 1058, 1521, 6911, 140/* 1520*/) -- Add/remove query ids here narrow down to the queries you are looking for
 	--AND q.query_id IN (15654) -- When you found the query, comment row above and select only that query here, and you will get the list of plans for that query
-	--AND rsi.start_time > DATEADD(hour, -2, GETDATE())
-	rsi.start_time >= '2021-10-15 19:00:00.000' AND rsi.end_time <= '2021-10-15 20:00:00.000'
+	rsi.start_time > DATEADD(DAY, -7, GETDATE())
+	--rsi.start_time >= '2021-10-15 19:00:00.000' AND rsi.end_time <= '2021-10-15 20:00:00.000'
 ORDER BY 
 	avg_cpu_time DESC
 	--rsi.start_time desc
 
 /*
- * Use this query to see if some plans are better than others
+ * Use this query to see if some plans are better than others for a specific id
  */
 SELECT TOP 50 
 	  rs.runtime_stats_id
@@ -133,6 +141,21 @@ WHERE
 	--AND rsi.start_time >= '2021-09-14 23:00:00.000' AND rsi.end_time <= '2021-09-15 00:00:00.000'
 ORDER BY 
 	rsi.start_time desc
+
+
+/*
+ * Get the SQL Statement from the Query Hash
+ */
+SELECT q.query_id, qt.query_sql_text, q.* 
+FROM sys.query_store_query q
+INNER JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
+WHERE q.query_hash = 0x301C509A005A2CF8
+ORDER BY q.last_execution_time DESC
+
+
+
+
+
 
 /*
  * Open one query plan in SSMS
