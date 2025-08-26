@@ -32,14 +32,15 @@ WHERE
 	--xeo.object_type = 'types'
 ORDER BY xep.name, xeo.name
 
-SELECT xep.name, xeo.name, xeo.description, xeoc.name, xeoc.description
+SELECT xep.name AS package_name, xeo.name as [object_name], xeo.description, xeoc.name AS event_name, xeoc.description
 FROM sys.dm_xe_objects xeo
 INNER JOIN sys.dm_xe_packages xep ON xeo.package_guid = xep.guid
 INNER JOIN sys.dm_xe_object_columns xeoc on xep.guid = xeoc.object_package_guid AND xeo.name = xeoc.object_name
 WHERE 
 	xeo.object_type = 'event'
-	and xeo.name = 'sql_statement_completed'
+	--and xeo.name = 'sql_statement_completed'
 	--and xeo.name = 'rpc_completed'
+	and xeo.name = 'sql_batch_completed'
 ORDER BY xep.name, xeo.name
 
 -- ACTIONS
@@ -54,7 +55,7 @@ WHERE
 	--xeo.object_type = 'types'
 ORDER BY xep.name, xeo.name
 
--- TARGETS
+/* Information about targets */
 SELECT xep.name + '.' + xeo.name AS [name], xeo.* 
 FROM sys.dm_xe_objects xeo
 INNER JOIN sys.dm_xe_packages xep ON xeo.package_guid = xep.guid
@@ -66,13 +67,15 @@ WHERE
 	--xeo.object_type = 'types'
 ORDER BY xep.name, xeo.name
 
-SELECT xep.name, xeo.name, xeo.description, xeoc.name, xeoc.description
+
+SELECT xep.name AS package_name, xeo.name AS [object_name], xeo.description, xeoc.name, xeoc.description
 FROM sys.dm_xe_objects xeo
 INNER JOIN sys.dm_xe_packages xep ON xeo.package_guid = xep.guid
 INNER JOIN sys.dm_xe_object_columns xeoc on xep.guid = xeoc.object_package_guid AND xeo.name = xeoc.object_name
 WHERE 
 	xeo.object_type = 'target'
-	and xeo.name = 'ring_buffer'
+	--and xeo.name = 'ring_buffer'
+	and xeo.name = 'event_file'
 	--and xeo.name = 'rpc_completed'
 ORDER BY xep.name, xeo.name
 
@@ -115,23 +118,88 @@ INNER JOIN sys.dm_xe_object_columns c on p.guid = c.object_package_guid AND o.na
 WHERE
 	o.object_type = 'event' AND
 	o.name = 'error_reported'
+GO	
+
 	
-	
 
 
+-- Create an Extended Events session that writes to disk. 
+-- For: 
+-- * SQL Server
+DECLARE @filename nvarchar(200) = N'G:\xe-logs\Performance Test Trace.xel';
 
--- SQL Server
-CREATE 
-	EVENT SESSION [Performance Test Trace] ON SERVER 
-ADD EVENT sqlserver.databases_bulk_insert_rows(
-    ACTION(sqlserver.query_hash,sqlserver.query_plan_hash)),
-ADD EVENT sqlserver.rpc_completed(SET collect_statement=(1)
-    ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash)
-    WHERE ([object_name]<>N'sp_reset_connection')),
-ADD EVENT sqlserver.sql_batch_completed(SET collect_batch_text=(1)
-    ACTION(sqlserver.client_app_name,sqlserver.client_hostname,sqlserver.database_id,sqlserver.database_name,sqlserver.nt_username,sqlserver.query_hash,sqlserver.query_plan_hash)) 
-ADD TARGET package0.event_file(SET filename=N'F:\Mounts\Data\Data01\SQLDATA\MSSQL11.MSSQLSERVER\MSSQL\Log\Performance Test Trace.xel',max_file_size=(2048),max_rollover_files=(10))
-WITH (MAX_MEMORY=4096 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=10 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=NONE,TRACK_CAUSALITY=OFF,STARTUP_STATE=OFF)
+DECLARE @sql NVARCHAR(MAX);
+
+SET @sql = N'
+CREATE EVENT SESSION [Performance Test Trace] 
+ON SERVER 
+	ADD EVENT sqlserver.sql_batch_completed
+	(
+		SET collect_batch_text=(1)
+		ACTION
+		(
+			sqlserver.client_app_name,
+			sqlserver.client_hostname,
+			sqlserver.database_id,
+			sqlserver.database_name,
+			sqlserver.nt_username,
+			sqlserver.query_hash,
+			sqlserver.query_plan_hash
+		)
+		WHERE 
+		(
+		    -- Use IN/NOT IN to filter on dbs
+			(
+				[sqlserver].[database_id] IN (1)
+			)
+			
+			-- Use this to only trace requests from a specific application
+			-- AND ([sqlserver].[client_hostname]=N''cLA''))
+
+			-- Use this filter if tracing rpc_completed
+			-- AND ([sqlserver].[not_equal_i_sql_unicode_string]([object_name],N''sp_reset_connection''))
+			
+			-- Use if looking for requests with a certain duration
+			-- AND ([package0].[greater_than_equal_uint64]([duration],(120000000)))
+			
+		)
+	) 
+	ADD TARGET package0.event_file
+	(
+		SET filename = N''' + @filename + N''', 
+			max_file_size=(512)	/* Maximum file size in MB */, 
+			max_rollover_files=(20) /* Maximum number of files to retain */
+	)
+	WITH 
+	(
+		MAX_MEMORY=4096 KB /* 4096 KB is default */
+		,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS /* Safeguard to keep acceptable performance */
+		,MAX_DISPATCH_LATENCY=30 SECONDS /* 30 seconds is default and good balance for event_file as not so much stress is put on the system */
+		,MAX_EVENT_SIZE=0 KB /* Default */
+		,MEMORY_PARTITION_MODE=NONE /* Default */
+		,TRACK_CAUSALITY=OFF /* Default, no need to track causality */
+		,STARTUP_STATE=OFF /* This event session is started manually */
+		--,MAX_DURATION = 2 DAYS /* Default is UNLIMITED  - SQL Server 2025 Preview feature*/
+	)
+
+';
+
+EXEC sp_executesql @sql;
+
+GO
+
+ALTER
+    EVENT SESSION
+        [Performance Test Trace]
+    ON SERVER
+    STATE = START;
+GO
+
+ALTER
+    EVENT SESSION
+        [Performance Test Trace]
+    ON SERVER
+    STATE = STOP;
 GO
 
 
