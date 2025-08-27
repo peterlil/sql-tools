@@ -1,4 +1,14 @@
 
+/*
+ * This script reads the SQL Server error logs by enumerating the logs, 
+ * then reading each log into a table variable as a cache, and lastly
+ * selecting everyting from the table variable.
+ *
+ * Requires permissions:
+ * VIEW SERVER STATE			: GRANT VIEW SERVER STATE TO [YourLoginName];
+ */
+
+
 DECLARE @ErrorLogs TABLE
 (
 	[Archive #] int NOT NULL,

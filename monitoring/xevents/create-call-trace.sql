@@ -123,9 +123,17 @@ GO
 	
 
 
--- Create an Extended Events session that writes to disk. 
--- For: 
--- * SQL Server
+/*
+ * Create an Extended Events session that writes to disk. 
+ * For: 
+ * - SQL Server
+ * 
+ * Requires permissions:
+ * - ALTER ANY EVENT SESSION	- GRANT ALTER ANY EVENT SESSION TO [YourLoginName];
+ * - VIEW SERVER STATE			- GRANT VIEW SERVER STATE TO [YourLoginName];
+ */
+
+ 
 DECLARE @filename nvarchar(200) = N'G:\xe-logs\Performance Test Trace.xel';
 
 DECLARE @sql NVARCHAR(MAX);
@@ -146,23 +154,24 @@ ON SERVER
 			sqlserver.query_hash,
 			sqlserver.query_plan_hash
 		)
-		WHERE 
-		(
-		    -- Use IN/NOT IN to filter on dbs
-			(
-				[sqlserver].[database_id] IN (1)
-			)
+		--WHERE 
+		--(
+		    -- Use to filter on dbs
+			--(
+			--	[sqlserver].[database_id] = 152
+			--)
 			
 			-- Use this to only trace requests from a specific application
-			-- AND ([sqlserver].[client_hostname]=N''cLA''))
+			-- AND ([sqlserver].[client_hostname]=N''cLA'')
 
+			--([sqlserver].[client_hostname]=N''SQL Server Management Studio'')
 			-- Use this filter if tracing rpc_completed
 			-- AND ([sqlserver].[not_equal_i_sql_unicode_string]([object_name],N''sp_reset_connection''))
 			
 			-- Use if looking for requests with a certain duration
 			-- AND ([package0].[greater_than_equal_uint64]([duration],(120000000)))
 			
-		)
+		--)
 	) 
 	ADD TARGET package0.event_file
 	(
@@ -200,6 +209,9 @@ ALTER
         [Performance Test Trace]
     ON SERVER
     STATE = STOP;
+GO
+
+DROP EVENT SESSION [Performance Test Trace] ON SERVER
 GO
 
 
