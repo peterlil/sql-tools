@@ -1,3 +1,26 @@
+-- Check if Query Store is enabled for a specific database
+-- Run the query in the context of the database you want to check
+SELECT actual_state_desc, desired_state_desc
+FROM sys.database_query_store_options
+GO
+
+-- Enable Query Store for a specific database
+-- Run the query in the context of the database you want to check
+ALTER DATABASE [YourDbName] -- Change to your database name
+SET QUERY_STORE = ON
+(
+    OPERATION_MODE = READ_WRITE,
+    CLEANUP_POLICY = ( STALE_QUERY_THRESHOLD_DAYS = 30 ),
+    DATA_FLUSH_INTERVAL_SECONDS = 900,
+    MAX_STORAGE_SIZE_MB = 2000,
+    INTERVAL_LENGTH_MINUTES = 30,
+    SIZE_BASED_CLEANUP_MODE = AUTO,
+    QUERY_CAPTURE_MODE = AUTO,
+    MAX_PLANS_PER_QUERY = 200,
+    WAIT_STATS_CAPTURE_MODE = ON
+);
+GO
+
 DECLARE @dbs TABLE
 (
     [name] sysname,
@@ -46,6 +69,3 @@ DEALLOCATE db_cursor;
 GO
 
 
-SELECT actual_state_desc, desired_state_desc
-FROM sys.database_query_store_options
-WHERE database_id = DB_ID('YourDatabaseName');
