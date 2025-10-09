@@ -91,17 +91,18 @@ ORDER BY rs.max_duration DESC;
  * Get the time of when a query executed
  */
 DECLARE @start_time datetime2(7) = '2025-09-01 00:00:00'
-DECLARE @end_time datetime2(7) = '2025-10-08 23:59:59'
-DECLARE @query_id INT = 9;
+DECLARE @end_time datetime2(7) = '2026-10-08 23:59:59'
+DECLARE @query_id INT = 124;
 
 DECLARE @start_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@start_time, '+02:00'), '+00:00');
 DECLARE @end_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@end_time, '+02:00'), '+00:00');
 
 SELECT TOP 20
     q.query_id,
-	rs.[max_duration],
+	rs.[max_duration] / 1000 AS max_duration_ms,
+	rs.avg_duration / 1000 AS avg_duration_ms,
 	ROUND(CAST(rs.[max_duration] AS float)/1000000.0, 1) AS max_duration_s,
-    rs.last_execution_time,
+    SWITCHOFFSET(TODATETIMEOFFSET(rs.last_execution_time, '+00:00'), '+02:00') as last_execution_time,
     qt.query_text_id,
     qt.query_sql_text,
 	rs.count_executions
@@ -124,9 +125,10 @@ GO
 ## Get waits for a query
 
 ```sql
+--waits
 DECLARE @start_time datetime2(7) = '2025-09-28 02:00:00' -- DATEADD(D, @noOfDays * -1, @end_time)
-DECLARE @end_time datetime2(7) = '2025-09-28 03:00:00' -- SYSDATETIME()
-DECLARE @query_id INT = 9;
+DECLARE @end_time datetime2(7) = '2026-09-28 03:00:00' -- SYSDATETIME()
+DECLARE @query_id INT = 124;
 
 DECLARE @start_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@start_time, '+02:00'), '+00:00');
 DECLARE @end_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@end_time, '+02:00'), '+00:00');
@@ -138,8 +140,8 @@ SELECT
     ws.execution_type_desc,
     ws.total_query_wait_time_ms,
     ws.avg_query_wait_time_ms,
-    rsi.start_time,
-    rsi.end_time
+    SWITCHOFFSET(TODATETIMEOFFSET(rsi.start_time, '+00:00'), '+02:00') as start_time,
+    SWITCHOFFSET(TODATETIMEOFFSET(rsi.end_time, '+00:00'), '+02:00') as end_time
 FROM sys.query_store_query q
 JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
 JOIN sys.query_store_plan p ON q.query_id = p.query_id
