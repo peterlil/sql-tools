@@ -15,6 +15,9 @@
 .PARAMETER Template
 	The path to the XML template file to prepare.
 
+.PARAMETER LogRoot
+	The root path to where to keep the scripts and logs. Path should be absolute.
+
 .OUTPUTS
 	The path to the newly created Scheduled Task template file.
 
@@ -29,7 +32,9 @@ param (
 	[Parameter(Position = 1, Mandatory = $false, HelpMessage = "Specify the SQL Server instance name. Leave empty for default instance.")]
 	[string] $InstanceName,
 	[Parameter(Position = 2, Mandatory = $true, HelpMessage = "Specify the path to the XML template file. Paths relative to the script location are supported.")]
-	[string] $Template
+	[string] $Template,
+	[Parameter(Position = 3, Mandatory = $false, HelpMessage = "Specify the root path to where to keep the scripts and logs. Path should be absolute.")]
+	[string] $LogRoot
 )
 
 # Prepare the Perfmon template
@@ -58,7 +63,8 @@ else {
 
 for ( $i = 0; $i -lt $strarr.Length; $i++ )
 { 
-	$strarr[$i] = ($strarr[$i] -replace "#InstanceName", $ReplaceString).TrimEnd(); 
+	$strarr[$i] = ($strarr[$i] -replace "#InstanceName", $ReplaceString).TrimEnd();
+	$strarr[$i] = ($strarr[$i] -replace "#LogRoot", $LogRoot).TrimEnd();
 }
 
 # add the instance name to the file name if it is supplied

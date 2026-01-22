@@ -14,6 +14,9 @@
 .PARAMETER Template
 	The path to the XML template file to use for the Perfmon configuration.
 
+.PARAMETER LogRoot
+	The root path to where to keep the scripts and logs. Path should be absolute.
+
 .OUTPUTS
 	The path to the newly created Perfmon template file.
 
@@ -28,7 +31,9 @@ param (
     [Parameter(Position = 1, Mandatory = $false, HelpMessage = "Specify the SQL Server instance name. Leave empty for default instance.")]
     [string] $InstanceName,
 	[Parameter(Position = 2, Mandatory = $true, HelpMessage = "Specify the path to the XML template file. Paths relative to the script location are supported.")]
-	[string] $Template
+	[string] $Template,
+	[Parameter(Position = 3, Mandatory = $true, HelpMessage = "Specify the root path to where to keep the scripts and logs. Path should be absolute.")]
+	[string] $LogRoot
 )
 
 # Prepare the Perfmon template
@@ -46,6 +51,7 @@ $strarr = Get-Content $Template
 for ( $i = 0; $i -lt $strarr.Length; $i++ )
 { 
 	$strarr[$i] = ($strarr[$i] -replace "#SERVER#", $ServerName); 
+	$strarr[$i] = ($strarr[$i] -replace "#LogRoot#", $LogRoot); 
 	if($InstanceName.Length -ne 0 -and $InstanceName.ToLower() -ne "default") 
 	{ 
 		if($strarr[$i].Contains("SQLServer:SSIS") -eq $false)

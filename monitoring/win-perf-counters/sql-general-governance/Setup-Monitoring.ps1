@@ -26,22 +26,32 @@ param (
     [Parameter(Position = 1, Mandatory = $false, HelpMessage = "Specify the SQL Server instance name. Leave empty for default instance.")]
     [string] $InstanceName,
     [Parameter(Position = 2, Mandatory = $false, HelpMessage = "Specify the path to the XML template file. Paths relative to the script location are supported.")]
-    [string] $Template = ".\PerformanceMonitorTemplate_SQL2019.xml"
+    [string] $Template = ".\PerformanceMonitorTemplate.xml",
+    [Parameter(Position = 2, Mandatory = $false, HelpMessage = "Specify the root path to where to keep the scripts and logs. Path should be absolute.")]
+    [string] $LogRoot = "%systemdrive%\PerfLogs"
 )
 
 try {
 
+    # If $LogRoot contains environment variables, expand them
+    $LogRoot = [Environment]::ExpandEnvironmentVariables($LogRoot)
+
+    # Create $LogRoot folder if it does not exist
+    if (-not (Test-Path -Path $LogRoot)) {
+        New-Item -ItemType Directory -Path $LogRoot -Force | Out-Null
+    }
+
     # Copy the script for compressing the files and removing old files to the right folder on the server
-    .\copy-scripts.ps1
+    .\copy-scripts.ps1 $LogRoot
 
     # Prepare the Perfmon template
-    $PerfmonTemplateFile = .\Prepare-PerfmonTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template $Template
+    $PerfmonTemplateFile = .\Prepare-PerfmonTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template $Template -LogRoot $LogRoot
 
     # Prepare the scheduled tasks templates
     $StartTraceTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\SQL Server Performance Analyzer Monitor - Scheduled Task.xml"
     $RestartTraceTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\SQL Server Performance Analyzer Monitor Restart - Scheduled Task.xml"
-    $RemoveOldLogsTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\Remove old logs - Scheduled Task.xml"
-    $ZipLogsTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\Zip Perfmon Logs - Scheduled Task.xml"
+    $RemoveOldLogsTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\Remove old logs - Scheduled Task.xml" -LogRoot $LogRoot
+    $ZipLogsTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\Zip Perfmon Logs - Scheduled Task.xml" -LogRoot $LogRoot
 
     $TraceName = "SQL Server Trace $InstanceName".TrimEnd()
 
