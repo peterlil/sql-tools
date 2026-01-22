@@ -17,6 +17,7 @@ WHERE
 
 
 -- Get all the event and action names from the file
+DECLARE @xe_file nvarchar(260) = ''
 SELECT event_name, action_name
 FROM 
 (
@@ -25,7 +26,7 @@ FROM
 		action.value('(@name)[1]', 'nvarchar(256)') AS action_name
 	FROM 
 		sys.fn_xe_file_target_read_file(
-			'G:\xe-logs\Performance Test Trace_0_134006778528650000.xel', 
+			@xe_file, 
 			NULL, NULL, NULL
 		) AS xef
 	CROSS APPLY 
@@ -37,6 +38,7 @@ GROUP BY event_name, action_name
 
 
 -- Get all the event field names from the file
+DECLARE @xe_file nvarchar(260) = ''
 SELECT event_name, field_name
 FROM 
 (
@@ -45,7 +47,7 @@ FROM
 		data.value('(@name)[1]', 'nvarchar(256)') AS field_name
 	FROM 
 		sys.fn_xe_file_target_read_file(
-			'G:\xe-logs\Performance Test Trace_0_134006778528650000.xel', 
+			@xe_file, 
 			NULL, NULL, NULL
 		) AS xef
 	CROSS APPLY 
@@ -56,6 +58,29 @@ FROM
 GROUP BY event_name, field_name
 GO
 
+-- Query the file for basic information
+DECLARE @xe_file nvarchar(260) = ''
+SELECT
+	xdata.value('(/event/@name)[1]', 'varchar(max)') AS [event]
+	, xdata.value('(/event/@timestamp)[1]', 'varchar(max)') AS [timestamp] 
+	, xdata.value('(/event/data[@name="duration"]/value)[1]', 'int')/1000 AS [duration_ms]
+	, xdata.value('(/event/data[@name="cpu_time"]/value)[1]', 'int')/1000 AS [cpu_time_ms]
+	, xdata.value('(/event/data[@name="logical_reads"]/value)[1]', 'int') AS [logical_reads]
+	, xdata.value('(/event/data[@name="writes"]/value)[1]', 'int') AS [writes]
+	, xdata.value('(/event/data[@name="row_count"]/value)[1]', 'int') AS [row_count]
+	, xdata.value('(/event/data[@name="statement"]/value)[1]', 'varchar(max)') AS [statement]
+	, xdata.value('(/event/action[@name="client_app_name"]/value)[1]', 'varchar(100)') AS [client_app_name]
+	, xdata.value('(/event/action[@name="client_hostname"]/value)[1]', 'varchar(100)') AS [client_hostname]
+	, xdata.value('(/event/action[@name="database_id"]/value)[1]', 'int') AS [database_id]
+	, xdata.value('(/event/action[@name="database_name"]/value)[1]', 'sysname') AS [database_name]
+	, xdata.value('(/event/action[@name="nt_username"]/value)[1]', 'sysname') AS [nt_username]
+FROM
+(
+	select CAST(event_data AS XML) 
+		from sys.fn_xe_file_target_read_file(@xe_file, NULL, NULL, NULL)
+)  as xmlr(xdata)
+WHERE xdata.value('(/event/action[@name="database_name"]/value)[1]', 'sysname') != 'master'
+ORDER BY duration_ms DESC
 
 
 
