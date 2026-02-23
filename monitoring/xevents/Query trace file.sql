@@ -1,5 +1,6 @@
 
 -- Find the trace file's name(s)
+DECLARE @TraceName SYSNAME = 'Performance Trace';
 SELECT 
 	xes.name AS [Event Session Name]
 	, xet.target_name
@@ -12,7 +13,7 @@ INNER JOIN
 	ON 
 		xes.address = xet.event_session_address
 WHERE 
-	xes.name = 'Performance Test Trace'
+	xes.name = @TraceName
 	AND xet.target_name = 'event_file'
 
 
@@ -36,6 +37,34 @@ FROM
 ) base
 GROUP BY event_name, action_name
 
+
+-- Get all the event field names and corresponding data type from the file
+DECLARE @xe_file nvarchar(260) =
+    N'G:\logs\extended-events\Performance Trace_0_134159891711350000.xel';
+
+;WITH events_in_file AS
+(
+    SELECT DISTINCT
+        CAST(xef.event_data AS xml).value('(event/@name)[1]', 'sysname') AS event_name
+    FROM sys.fn_xe_file_target_read_file(@xe_file, NULL, NULL, NULL) AS xef
+)
+SELECT
+    e.event_name,
+    oc.name        AS payload_field,
+    oc.type_name   AS xe_type_name,
+    oc.column_type,
+    oc.description
+FROM events_in_file e
+JOIN sys.dm_xe_objects o
+    ON o.name = e.event_name
+   AND o.object_type = 'event'
+JOIN sys.dm_xe_object_columns oc
+    ON oc.object_name = o.name
+   AND oc.object_package_guid = o.package_guid
+   AND oc.column_type = 'data'
+ORDER BY e.event_name, oc.name;
+
+GO
 
 -- Get all the event field names from the file
 DECLARE @xe_file nvarchar(260) = ''
@@ -108,8 +137,61 @@ ORDER BY duration_ms DESC
 
 
 
+/* Query Performance Trace file for sql_statement_completed and sql_batch_completed */
 
+DECLARE @xe_file nvarchar(260) =
+  N'G:\logs\extended-events\Performance Trace_0_134159891711350000.xel';
 
+WITH XEvents AS
+(
+    SELECT CAST(event_data AS xml) AS xdata
+    FROM sys.fn_xe_file_target_read_file(@xe_file, NULL, NULL, NULL)
+)
+SELECT
+      xdata.value('(/event/@name)[1]', 'sysname') AS [event]
+    , xdata.value('(/event/@timestamp)[1]', 'datetime2(3)') AS [timestamp]
+
+    , xdata.value('(/event/data[@name="duration"]/value)[1]', 'bigint') / 1000 AS [duration_ms]
+    , xdata.value('(/event/data[@name="cpu_time"]/value)[1]', 'bigint') / 1000 AS [cpu_time_ms]
+    , xdata.value('(/event/data[@name="logical_reads"]/value)[1]', 'bigint') AS [logical_reads]
+	, xdata.value('(/event/data[@name="page_server_reads"]/value)[1]', 'bigint') AS [page_server_reads]
+	, xdata.value('(/event/data[@name="physical_reads"]/value)[1]', 'bigint') AS [physical_reads]
+    , xdata.value('(/event/data[@name="writes"]/value)[1]', 'bigint') AS [writes]
+    , xdata.value('(/event/data[@name="row_count"]/value)[1]', 'bigint') AS [row_count]
+	, xdata.value('(/event/data[@name="spills"]/value)[1]', 'bigint') AS spills
+	
+    -- Present for sql_statement_completed
+    , CASE WHEN xdata.exist('/event/data[@name="statement"]/value') = 1
+           THEN xdata.value('(/event/data[@name="statement"]/value)[1]', 'nvarchar(max)')
+      END AS [statement]
+	, CASE WHEN xdata.exist('/event/data[@name="last_row_count"]/value') = 1
+           THEN xdata.value('(/event/data[@name="last_row_count"]/value)[1]', 'bigint')
+      END AS last_row_count
+	, CASE WHEN xdata.exist('/event/data[@name="line_number"]/value') = 1
+           THEN xdata.value('(/event/data[@name="line_number"]/value)[1]', 'int')
+      END AS [line_number]
+	, CASE WHEN xdata.exist('/event/data[@name="offset"]/value') = 1
+           THEN xdata.value('(/event/data[@name="offset"]/value)[1]', 'int')
+      END AS [offset]
+	, CASE WHEN xdata.exist('/event/data[@name="offset_end"]/value') = 1
+           THEN xdata.value('(/event/data[@name="offset_end"]/value)[1]', 'int')
+      END AS [offset_end]
+	
+    -- Present for sql_batch_completed (if that event includes batch_text)
+    , CASE WHEN xdata.exist('/event/data[@name="batch_text"]/value') = 1
+           THEN xdata.value('(/event/data[@name="batch_text"]/value)[1]', 'nvarchar(max)')
+      END AS [batch_text]
+
+    , xdata.value('(/event/action[@name="client_app_name"]/value)[1]', 'nvarchar(100)') AS [client_app_name]
+    , xdata.value('(/event/action[@name="client_hostname"]/value)[1]', 'nvarchar(100)') AS [client_hostname]
+    , xdata.value('(/event/action[@name="database_id"]/value)[1]', 'int') AS [database_id]
+    , xdata.value('(/event/action[@name="database_name"]/value)[1]', 'sysname') AS [database_name]
+    , xdata.value('(/event/action[@name="nt_username"]/value)[1]', 'sysname') AS [nt_username]
+    , xdata.value('(/event/action[@name="query_hash"]/value)[1]', 'binary(8)') AS [query_hash]
+    , xdata.value('(/event/action[@name="query_plan_hash"]/value)[1]', 'binary(8)') AS [query_plan_hash]
+FROM XEvents
+WHERE xdata.value('(/event/action[@name="database_name"]/value)[1]', 'sysname') <> 'master'
+ORDER BY [duration_ms] DESC;
 
 
 

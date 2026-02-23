@@ -53,6 +53,82 @@ ORDER BY
 GO
 ```
 
+### Find all queries and order by highest logical reads
+
+```sql
+
+-- Find queries relative today
+--DECLARE @noOfDays int = 7
+--DECLARE @end_time datetime2(7) = SYSDATETIME()
+--DECLARE @start_time datetime2(7) = DATEADD(D, @noOfDays * -1, @end_time)
+
+-- Find the queries based on date and time
+DECLARE @start_time datetime2(7) = '2026-02-20 01:00:00'
+DECLARE @end_time datetime2(7) = '2026-02-20 08:00:00'
+
+
+DECLARE @start_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@start_time, '+02:00'), '+00:00');
+DECLARE @end_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@end_time, '+02:00'), '+00:00');
+SELECT 
+	  rs.runtime_stats_id
+	, p.plan_id
+	, q.query_id
+	, qt.query_text_id
+	, qt.query_sql_text
+	, rs.count_executions
+	, rs.avg_duration / 1000000 AS avg_duration_in_seconds -- Use seconds or minutes depending on your circumstances
+	, rs.avg_logical_io_reads * 8 / 1024 AS avg_logical_io_reads_in_mb
+	, rs.last_logical_io_reads * 8 / 1024 AS last_logical_io_reads_in_mb
+	, rs.min_logical_io_reads * 8 / 1024 AS min_logical_io_reads_in_mb
+	, rs.max_logical_io_reads * 8 / 1024 AS max_logical_io_reads_in_mb
+	, (rs.avg_logical_io_reads * rs.count_executions) * 8 / 1024 AS total_logical_io_reads_in_mb
+	, rs.stdev_logical_io_reads * 8 / 1024 AS stddev_logical_io_reads_in_mb
+	, rs.avg_logical_io_writes * 8 / 1024 AS avg_logical_io_writes_in_mb
+	, rs.last_logical_io_writes * 8 / 1024 AS last_logical_io_writes_in_mb
+	, rs.min_logical_io_writes * 8 / 1024 AS min_logical_io_writes_in_mb
+	, rs.max_logical_io_writes * 8 / 1024 AS max_logical_io_writes_in_mb
+	, rs.avg_physical_io_reads * 8 / 1024 AS avg_physical_io_reads_in_mb
+	, rs.last_physical_io_reads * 8 / 1024 AS last_physical_io_reads_in_mb
+	, rs.min_physical_io_reads * 8 / 1024 AS min_physical_io_reads_in_mb
+	, rs.max_physical_io_reads * 8 / 1024 AS max_physical_io_reads_in_mb
+	, rs.avg_tempdb_space_used * 8 / 1024 AS avg_tempdb_space_used_in_mb
+	, rs.last_tempdb_space_used * 8 / 1024 AS last_tempdb_space_used_in_mb
+	, rs.min_tempdb_space_used * 8 / 1024 AS min_tempdb_space_used_in_mb
+	, rs.max_tempdb_space_used * 8 / 1024 AS max_tempdb_space_used_in_mb
+	, rs.avg_dop
+	, rs.last_dop
+	, rs.min_dop
+	, rs.max_dop
+	, rs.max_duration / 1000000 AS max_duration_in_seconds -- Use seconds or minutes depending on your circumstances
+	, (rs.avg_duration * rs.count_executions) / 1000000 AS total_duration_in_seconds
+	, ROUND(rs.min_duration / 1000000, 0) AS min_duration_in_seconds -- Use seconds or minutes depending on your circumstances
+	--, rs.max_duration / 60000000 AS max_duration_in_minutes -- Use seconds or minutes depending on your circumstances
+	--, ROUND(rs.avg_duration / 60000000, 0) AS avg_duration_in_minutes -- Use seconds or minutes depending on your circumstances
+	--, rs.min_duration / 60000000 AS min_duration_in_minutes -- Use seconds or minutes depending on your circumstances
+	, rs.max_rowcount, ROUND(rs.avg_rowcount, 0) AS avg_rowcount, rs.min_rowcount
+	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rsi.start_time, '+00:00'), '+02:00'), 120) as rsi_start_time
+	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rsi.end_time, '+00:00'), '+02:00'), 120) as rsi_endtime
+	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rs.last_execution_time, '+00:00'), '+02:00'), 120) as last_execution_time
+	--, rs.*, rsi.*, p.*
+FROM sys.query_store_runtime_stats rs
+INNER JOIN sys.query_store_runtime_stats_interval rsi ON rs.runtime_stats_interval_id = rsi.runtime_stats_interval_id
+INNER JOIN sys.query_store_plan p ON rs.plan_id = p.plan_id
+INNER JOIN sys.query_store_query q ON p.query_id = q.query_id
+INNER JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
+WHERE 
+	--execution_type = 0 -- regular execution (successfully finished)
+	--AND q.query_id NOT IN (4524, 1058, 1521, 6911, 140/* 1520*/) -- Add/remove query ids here narrow down to the queries you are looking for
+	--AND q.query_id IN (15654) -- When you found the query, comment row above and select only that query here, and you will get the list of plans for that query
+	--AND rsi.start_time > DATEADD(hour, -2, GETDATE())
+	rsi.start_time >= @start_time_utc AND rsi.end_time <= @end_time_utc
+ORDER BY 
+	max_logical_io_reads DESC
+	--rsi.start_time desc
+	-- avg_duration_in_seconds DESC
+	--total_duration_in_seconds DESC
+GO
+```
+
 ### Find the queries with execution time longer than x seconds
 
 ```sql
