@@ -55,6 +55,8 @@ GO
 
 ### Find all queries and order by highest logical reads
 
+This query works for other searches as well, such as reads and writes, just change the sort order. 
+
 ```sql
 
 -- Find queries relative today
@@ -63,12 +65,13 @@ GO
 --DECLARE @start_time datetime2(7) = DATEADD(D, @noOfDays * -1, @end_time)
 
 -- Find the queries based on date and time
-DECLARE @start_time datetime2(7) = '2026-02-20 01:00:00'
-DECLARE @end_time datetime2(7) = '2026-02-20 08:00:00'
+DECLARE @start_time datetime2(7) = '2026-02-23 01:00:00'
+DECLARE @end_time datetime2(7) = '2026-02-23 03:00:00'
 
+DECLARE @utc_offset varchar(10) = '+01:00'
 
-DECLARE @start_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@start_time, '+02:00'), '+00:00');
-DECLARE @end_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@end_time, '+02:00'), '+00:00');
+DECLARE @start_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@start_time, @utc_offset), '+00:00');
+DECLARE @end_time_utc datetime2(7) = SWITCHOFFSET(TODATETIMEOFFSET(@end_time, @utc_offset), '+00:00');
 SELECT 
 	  rs.runtime_stats_id
 	, p.plan_id
@@ -95,6 +98,10 @@ SELECT
 	, rs.last_tempdb_space_used * 8 / 1024 AS last_tempdb_space_used_in_mb
 	, rs.min_tempdb_space_used * 8 / 1024 AS min_tempdb_space_used_in_mb
 	, rs.max_tempdb_space_used * 8 / 1024 AS max_tempdb_space_used_in_mb
+	, avg_cpu_time / 1000000 AS avg_cpu_time_in_seconds
+	, min_cpu_time / 1000000 AS min_cpu_time_in_seconds
+	, max_cpu_time / 1000000 AS max_cpu_time_in_seconds
+	, avg_cpu_time / 1000000 * rs.count_executions AS total_cpu_time_in_seconds
 	, rs.avg_dop
 	, rs.last_dop
 	, rs.min_dop
@@ -106,9 +113,9 @@ SELECT
 	--, ROUND(rs.avg_duration / 60000000, 0) AS avg_duration_in_minutes -- Use seconds or minutes depending on your circumstances
 	--, rs.min_duration / 60000000 AS min_duration_in_minutes -- Use seconds or minutes depending on your circumstances
 	, rs.max_rowcount, ROUND(rs.avg_rowcount, 0) AS avg_rowcount, rs.min_rowcount
-	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rsi.start_time, '+00:00'), '+02:00'), 120) as rsi_start_time
-	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rsi.end_time, '+00:00'), '+02:00'), 120) as rsi_endtime
-	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rs.last_execution_time, '+00:00'), '+02:00'), 120) as last_execution_time
+	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rsi.start_time, '+00:00'), @utc_offset), 120) as rsi_start_time
+	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rsi.end_time, '+00:00'), @utc_offset), 120) as rsi_endtime
+	, CONVERT(nvarchar(30), SWITCHOFFSET(TODATETIMEOFFSET(rs.last_execution_time, '+00:00'), @utc_offset), 120) as last_execution_time
 	--, rs.*, rsi.*, p.*
 FROM sys.query_store_runtime_stats rs
 INNER JOIN sys.query_store_runtime_stats_interval rsi ON rs.runtime_stats_interval_id = rsi.runtime_stats_interval_id
@@ -126,6 +133,7 @@ ORDER BY
 	--rsi.start_time desc
 	-- avg_duration_in_seconds DESC
 	--total_duration_in_seconds DESC
+	--total_cpu_time_in_seconds DESC
 GO
 ```
 
@@ -285,4 +293,17 @@ FROM top_waits_per_interval ts
   JOIN sys.query_store_wait_stats ws ON p.plan_id = ws.plan_id AND rsi.runtime_stats_interval_id = ws.runtime_stats_interval_id AND ts.max_total_query_wait_time_ms = ws.total_query_wait_time_ms
 	
 GO 
+```
+
+## Get the plan by the plan id
+
+```sql
+DECLARE @plan_id bigint = ;  -- <-- your plan_id
+
+SELECT
+    p.plan_id,
+    p.query_id,
+    TRY_CONVERT(xml, p.query_plan) AS query_plan_xml
+FROM sys.query_store_plan AS p
+WHERE p.plan_id = @plan_id;
 ```
