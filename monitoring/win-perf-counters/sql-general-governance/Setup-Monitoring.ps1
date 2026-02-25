@@ -48,8 +48,8 @@ try {
     $PerfmonTemplateFile = .\Prepare-PerfmonTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template $Template -LogRoot $LogRoot
 
     # Prepare the scheduled tasks templates
-    $StartTraceTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\SQL Server Performance Analyzer Monitor - Scheduled Task.xml"
-    $RestartTraceTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\SQL Server Performance Analyzer Monitor Restart - Scheduled Task.xml"
+    $StartTraceTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\SQL Server Trace - Scheduled Task.xml"
+    $RestartTraceTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\SQL Server Trace Restart - Scheduled Task.xml"
     $RemoveOldLogsTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\Remove old logs - Scheduled Task.xml" -LogRoot $LogRoot
     $ZipLogsTaskFile = .\Prepare-ScheduledTaskTemplate.ps1 -ServerName $ServerName -InstanceName $InstanceName -Template ".\Zip Perfmon Logs - Scheduled Task.xml" -LogRoot $LogRoot
 
