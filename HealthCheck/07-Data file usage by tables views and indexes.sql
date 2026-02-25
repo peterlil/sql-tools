@@ -95,6 +95,8 @@ ORDER BY[Data (kB)] DESC;
 
 -------------------------------------------------------------------
 
+-- The query below will produce multiple rows per table if it's partitioned.
+/*
 SELECT 
 	SUM (
 		CASE
@@ -176,3 +178,4 @@ FROM
 	INNER JOIN sys.schemas sch on t.schema_id = sch.schema_id
 	GROUP BY sch.name, t.name, it.parent_id
 ) P
+*/
