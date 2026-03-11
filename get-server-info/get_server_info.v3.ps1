@@ -30,7 +30,17 @@ function Get-ScriptDirectory
 
 if ($serverName.Length -eq 0) {
     $tmp = Get-WmiObject Win32_ComputerSystem
-    $serverName = $tmp.Name + "." + $tmp.Domain
+	# If the server is not domain joined, the Domain property will be the same as the Name property. In that case, use only the Name property as server name.
+	# If the domain name is WORKGROUP, we are also not interested in the domain name.
+	if($tmp.Domain -ne $tmp.Name -and $tmp.Domain -ne "WORKGROUP")
+	{
+		$serverName = $tmp.Name + "." + $tmp.Domain
+	}
+	else
+	{
+		$serverName = $tmp.Name
+	}
+	Write-Host "No server name provided. Using local server: $serverName" -ForegroundColor Yellow;
 }
 $scriptStartDateTime = [System.DateTime]::Now.ToString("yyyyMMdd-HHmm")
 
@@ -68,9 +78,9 @@ $computerSystem | format-table Caption, BuildNumber, BuildType, CodeSet, Country
 	CurrentTimeZone, Description, ForegroundApplicationBoost, FreePhysicalMemory, FreeSpaceInPagingFile, 
 	FreeVirtualMemory, Name, OperatingSystemSKU, Organization, OSArchitecture, OSLanguage, OSType, 
 	RegisteredUser, SerialNumber, ServicePackMajorVersion, ServicePackMinorVersion,
-	@{Name=”Installation Date”; Expression={$_.ConvertToDateTime($_.InstallDate)}}, 
-	@{Name=”Last Bootup time”; Expression={$_.ConvertToDateTime($_.LastBootUpTime)}}, 
-	@{Name=”Local Date Time”; Expression={$_.ConvertToDateTime($_.LocalDateTime)}} -AutoSize | Out-String -Width 4096 | Out-File -FilePath $outputFilename -Append
+	@{Name=ï¿½Installation Dateï¿½; Expression={$_.ConvertToDateTime($_.InstallDate)}}, 
+	@{Name=ï¿½Last Bootup timeï¿½; Expression={$_.ConvertToDateTime($_.LastBootUpTime)}}, 
+	@{Name=ï¿½Local Date Timeï¿½; Expression={$_.ConvertToDateTime($_.LocalDateTime)}} -AutoSize | Out-String -Width 4096 | Out-File -FilePath $outputFilename -Append
 
 if($computerSystem.ForeGroundApplicationBoost -ne 0)
 {
@@ -106,7 +116,7 @@ Write-Host "Quering object Win32_BootConfiguration." -ForegroundColor Green;
 Get-WmiObject Win32_BootConfiguration -ComputerName $serverName | format-table Name, BootDirectory | Out-File -FilePath $outputFilename -Append
 
 $dtype = DATA {
-ConvertFrom-StringData -StringData @’ 
+ConvertFrom-StringData -StringData @'
 0 = Unknown 
 1 = No Root Directory 
 2 = Removable Disk 
@@ -114,34 +124,34 @@ ConvertFrom-StringData -StringData @’
 4 = Network Drive 
 5 = Compact Disk 
 6 = RAM Disk 
-‘@
+'@
 }
  
 $media = DATA {
-ConvertFrom-StringData -StringData @’ 
+ConvertFrom-StringData -StringData @'
 11 = Removable media other than floppy 
 12 = Fixed hard disk media 
-‘@
+'@
 }
 
 $admPwdStatus = DATA {
-ConvertFrom-StringData -StringData @’ 
+ConvertFrom-StringData -StringData @' 
 1 = Disabled
 2 = Enabled
 3 = Not Implemented
 4 = Unknown
-‘@
+'@
 }
 
 $domainRole = DATA {
-ConvertFrom-StringData -StringData @’ 
+ConvertFrom-StringData -StringData @' 
 0 = Standalone Workstation
 1 = Member Workstation
 2 = Standalone Server
 3 = Member Server
 4 = Backup Domain Controller
 5 = Primary Domain Controller
-‘@
+'@
 }
 
 Write-Host "Quering object Win32_ComputerSystem." -ForegroundColor Green;
@@ -423,7 +433,8 @@ $diskSummary | format-table * -AutoSize | Out-String -Width 4096 | Sort-Object -
 # Network
 Write-Host "Quering object Win32_NetworkAdapter." -ForegroundColor Green;
 get-wmiobject Win32_NetworkAdapter -ComputerName $serverName `
-	| Sort-Object -Property PhysicalAdapter, Name `    | format-table Name, PhysicalAdapter, Caption, Speed, `
+	| Sort-Object -Property PhysicalAdapter, Name `
+    | format-table Name, PhysicalAdapter, Caption, Speed, `
 	    MACAddress, Manufacturer, MaxSpeed, NetworkAddresses, PermanentAddress, `
 	    ProductName,  Description, ServiceName -AutoSize `
     | Out-String -Width 4096 | Out-File -FilePath $outputFilename -Append
@@ -520,7 +531,7 @@ if($dbName.Length -eq 0) {
 $sqlServerVersion = 'unknown';
 
 Write-Host "Quering for version path" -ForegroundColor Green;
-$version = invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT @@VERSION AS Version"
+$version = invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT @@VERSION AS Version"
 if ( $version.version.Contains( "Microsoft SQL Server 2008" ) ) {
     $sqlServerVersion='100'
 } elseif ( $version.version.Contains( "Microsoft SQL Server 2012" ) ) {
@@ -618,42 +629,43 @@ if($skipDatabaseQueries -eq $false) {
 	Write-Host "Quering for authentication schemes used" -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_auth-scheme.txt"
 	"List authentication schemes that are used. " | Out-File -FilePath $tmpFilename -Append
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT session_id, client_net_address, auth_scheme FROM sys.dm_exec_connections" `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT session_id, client_net_address, auth_scheme FROM sys.dm_exec_connections" `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Quering for the instance collection." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_instance-collation.txt"
 	"Get the instance collation. " | Out-File -FilePath $tmpFilename -Append
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT SERVERPROPERTY('Collation') AS [COLLATION]" `
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT SERVERPROPERTY('Collation') AS [COLLATION]" `
 		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Quering for authentication configuration." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_integrated-security-only.txt"
 	"Authentication configuration. " | Out-File -FilePath $tmpFilename -Append
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT SERVERPROPERTY('IsIntegratedSecurityOnly') AS [IsIntegratedSecurityOnly]" `
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT SERVERPROPERTY('IsIntegratedSecurityOnly') AS [IsIntegratedSecurityOnly]" `
 		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 	
 	
 	Write-Host "Quering for node names." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_instance-names.txt"
 	"Node name(s). " | Out-File -FilePath $tmpFilename -Append
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT SERVERPROPERTY('ComputerNamePhysicalNetBIOS') AS [ComputerNamePhysicalNetBIOS], SERVERPROPERTY('InstanceName') AS [InstanceName], SERVERPROPERTY('MachineName') AS [MachineName]" `
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT SERVERPROPERTY('ComputerNamePhysicalNetBIOS') AS [ComputerNamePhysicalNetBIOS], SERVERPROPERTY('InstanceName') AS [InstanceName], SERVERPROPERTY('MachineName') AS [MachineName]" `
 		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 #	$tmpFilename = $baseOutputFilename + "_index-fragmentation.txt"
 #	"Index fragmentation. " | Out-File -FilePath $tmpFilename -Append
-#	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT * FROM sys.dm_db_index_physical_stats(null, null, null, null, 'LIMITED');" `
+#	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT * FROM sys.dm_db_index_physical_stats(null, null, null, null, 'LIMITED');" `
 #		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 	
 	Write-Host "Quering for recovery model." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_recovery-model.txt"
 	"Recovery model. " | Out-File -FilePath $tmpFilename -Append
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT name AS [Database Name], recovery_model_desc AS [Recovery Model] FROM sys.databases ORDER BY recovery_model_desc, name;" `
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT name AS [Database Name], recovery_model_desc AS [Recovery Model] FROM sys.databases ORDER BY recovery_model_desc, name;" `
 		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Quering for standby databases" -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_standby-databases.txt"
 	"List of databases in standby" | Out-File -FilePath $tmpFilename -Append
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query "SELECT name AS [Database Name],	is_in_standby AS [IsInStandby] FROM sys.databases WHERE is_in_standby = 1 ORDER BY name;" `
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query "SELECT name AS [Database Name],	is_in_standby AS [IsInStandby] FROM sys.databases WHERE is_in_standby = 1 ORDER BY name;" `
 		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 	
 	
@@ -669,7 +681,8 @@ if($skipDatabaseQueries -eq $false) {
 	{
 		$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "Database-file-report.sql"));
 	}
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query transaction-log-fragment-report-alternative.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_vlf-report.txt"
@@ -679,56 +692,66 @@ if($skipDatabaseQueries -eq $false) {
     } else {
 		$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "Transaction-log-fragment-report-altenative_110.sql"));
 	}
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query traceflags.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_traceflags.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "check running traceflags.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query database-sizes.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_database-sizes.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "database sizes.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query db-info.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_db-info.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "db-info.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query sa-owned-jobs.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_sa-owned-jobs.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "sa-owned-jobs.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query version-check.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_version-check.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "version-check.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 	 
 	Write-Host "Sending query sys-configuration.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_sys-configuration.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "sys-configuration.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query dbfile-placementdataorlog-files-in-folders.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_dbfile-placementdataorlog-folderbased.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "dbfile-placementdataorlog-files-in-folders.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query dbfile-placementsdataorlog-files-in-drives.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_dbfile-placementdataorlog-driveletterbased.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "dbfile-placementdataorlog-files-in-drives.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query autogrowth.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_autogrowth.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "autogrowth.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
+		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 
 	Write-Host "Sending query dbcc-checkdb.sql." -ForegroundColor Green;
 	$tmpFilename = $baseOutputFilename + "_dbcc-checkdb.txt"
 	$tmpQuery = [System.IO.File]::ReadAllText((join-Path $scriptDir "dbcc-checkdb.sql"));
-	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName –Query $tmpQuery `
+	invoke-sqlcmd -ServerInstance $sqlServerName -Database $dbName ï¿½Query $tmpQuery `
 		| Format-Table -AutoSize | Out-String -Width 4096 | Out-File -FilePath $tmpFilename -Append
 }
