@@ -214,6 +214,269 @@ GO
 DROP EVENT SESSION [Performance Test Trace] ON SERVER
 GO
 
+/*
+ * Create an Extended Events session that writes to disk. 
+ * For: 
+ * - SQL Server 2022
+ * 
+ * Requires permissions:
+ * - ALTER ANY EVENT SESSION	- GRANT ALTER ANY EVENT SESSION TO [YourLoginName];
+ * - VIEW SERVER STATE			- GRANT VIEW SERVER STATE TO [YourLoginName];
+ */
+
+ 
+DECLARE @filename nvarchar(200) = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\trace\Performance Trace.xel';
+
+DECLARE @sql NVARCHAR(MAX);
+
+SET @sql = CAST(N'
+CREATE EVENT SESSION [Performance Trace] 
+ON SERVER 
+	ADD EVENT sqlserver.sql_batch_completed
+	(
+		SET collect_batch_text=(1)
+		ACTION
+		(
+			sqlserver.client_app_name,
+			sqlserver.client_hostname,
+			sqlserver.database_id,
+			sqlserver.database_name,
+			sqlserver.nt_username,
+			sqlserver.query_hash,
+			sqlserver.query_plan_hash
+		)
+		WHERE 
+		(
+		    (
+				[sqlserver].[database_id]=(7)
+				OR 
+				[sqlserver].[database_id]=(8)
+				OR 
+				[sqlserver].[database_id]=(9)
+				OR 
+				[sqlserver].[database_id]=(10)
+				OR 
+				[sqlserver].[database_id]=(12)
+				OR 
+				[sqlserver].[database_id]=(14)
+				OR 
+				[sqlserver].[database_id]=(16)
+				OR 
+				[sqlserver].[database_id]=(17)
+				OR 
+				[sqlserver].[database_id]=(20)
+			)
+			-- Use if looking for requests with a certain duration
+			-- AND ([package0].[greater_than_equal_uint64]([duration],(5000000)))
+		)
+	),
+	ADD EVENT sqlserver.sql_statement_completed
+	(
+		SET collect_statement=(1)
+		ACTION
+		(
+			sqlserver.client_app_name,
+			sqlserver.client_hostname,
+			sqlserver.database_id,
+			sqlserver.database_name,
+			sqlserver.nt_username,
+			sqlserver.query_hash,
+			sqlserver.query_plan_hash
+		)
+		WHERE 
+		(
+		    (
+				[sqlserver].[database_id]=(7)
+				OR 
+				[sqlserver].[database_id]=(8)
+				OR 
+				[sqlserver].[database_id]=(9)
+				OR 
+				[sqlserver].[database_id]=(10)
+				OR 
+				[sqlserver].[database_id]=(12)
+				OR 
+				[sqlserver].[database_id]=(14)
+				OR 
+				[sqlserver].[database_id]=(16)
+				OR 
+				[sqlserver].[database_id]=(17)
+				OR 
+				[sqlserver].[database_id]=(20)
+			)
+			-- Use if looking for requests with a certain duration
+			-- AND ([package0].[greater_than_equal_int64]([duration],(5000000)))
+		)
+	),
+	ADD EVENT sqlserver.rpc_completed
+	(
+		ACTION(
+			sqlserver.client_app_name,
+			sqlserver.client_hostname,
+			sqlserver.database_id,
+			sqlserver.database_name,
+			sqlserver.nt_username,
+			sqlserver.query_hash,
+			sqlserver.query_plan_hash
+		)
+    	WHERE (
+			([sqlserver].[not_equal_i_sql_unicode_string]([object_name],N''sp_reset_connection'')) 
+			--AND 
+			--([package0].[greater_than_equal_uint64]([duration],(5000000)))
+			AND 
+			(
+				[sqlserver].[database_id]=(7)
+				OR 
+				[sqlserver].[database_id]=(8)
+				OR 
+				[sqlserver].[database_id]=(9)
+				OR 
+				[sqlserver].[database_id]=(10)
+				OR 
+				[sqlserver].[database_id]=(12)
+				OR 
+				[sqlserver].[database_id]=(14)
+				OR 
+				[sqlserver].[database_id]=(16)
+				OR 
+				[sqlserver].[database_id]=(17)
+				OR 
+				[sqlserver].[database_id]=(20)
+			)
+		) 
+	),
+	-- Captures each statement executed inside a stored procedure
+	ADD EVENT sqlserver.sp_statement_completed (
+		SET collect_statement = (1)
+		ACTION (
+			sqlserver.client_app_name,
+			sqlserver.client_hostname,
+			sqlserver.database_name,
+			sqlserver.nt_username,
+			sqlserver.query_hash,
+			sqlserver.query_plan_hash
+		)
+		WHERE (
+			[sqlserver].[database_id]=(7)
+			OR 
+			[sqlserver].[database_id]=(8)
+			OR 
+			[sqlserver].[database_id]=(9)
+			OR 
+			[sqlserver].[database_id]=(10)
+			OR 
+			[sqlserver].[database_id]=(12)
+			OR 
+			[sqlserver].[database_id]=(14)
+			OR 
+			[sqlserver].[database_id]=(16)
+			OR 
+			[sqlserver].[database_id]=(17)
+			OR 
+			[sqlserver].[database_id]=(20)
+		)
+	),
+	-- Captures completion of nested stored procedures / triggers / functions
+	ADD EVENT sqlserver.module_end (
+		SET collect_statement = (1)
+		ACTION (
+			sqlserver.client_app_name,
+			sqlserver.client_hostname,
+			sqlserver.database_name,
+			sqlserver.nt_username
+		)
+		WHERE (
+			[sqlserver].[database_id]=(7)
+			OR 
+			[sqlserver].[database_id]=(8)
+			OR 
+			[sqlserver].[database_id]=(9)
+			OR 
+			[sqlserver].[database_id]=(10)
+			OR 
+			[sqlserver].[database_id]=(12)
+			OR 
+			[sqlserver].[database_id]=(14)
+			OR 
+			[sqlserver].[database_id]=(16)
+			OR 
+			[sqlserver].[database_id]=(17)
+			OR 
+			[sqlserver].[database_id]=(20)
+		)
+	),
+	ADD EVENT sqlserver.error_reported
+	(
+		ACTION(
+			sqlserver.client_app_name,
+			sqlserver.client_hostname,
+			sqlserver.database_id,
+			sqlserver.database_name,
+			sqlserver.nt_username,
+			sqlserver.query_hash,
+			sqlserver.query_plan_hash
+		)
+		WHERE (
+			(
+				([package0].[equal_uint64]([sqlserver].[database_id],(7))) 
+				OR 
+				([package0].[equal_uint64]([sqlserver].[database_id],(8)))
+				OR 
+				([package0].[equal_uint64]([sqlserver].[database_id],(9)))
+				OR
+				([package0].[equal_uint64]([sqlserver].[database_id],(10))) 
+				OR 
+				([package0].[equal_uint64]([sqlserver].[database_id],(12)))
+				OR 
+				([package0].[equal_uint64]([sqlserver].[database_id],(14)))
+				OR
+				([package0].[equal_uint64]([sqlserver].[database_id],(16))) 
+				OR 
+				([package0].[equal_uint64]([sqlserver].[database_id],(17)))
+				OR 
+				([package0].[equal_uint64]([sqlserver].[database_id],(20)))
+			)
+		)
+	)
+	ADD TARGET package0.event_file
+	(
+		SET filename = N'''  AS NVARCHAR(MAX)) + @filename + N''', 
+			max_file_size=(512)	/* Maximum file size in MB */, 
+			max_rollover_files=(40) /* Maximum number of files to retain */
+	)
+	WITH 
+	(
+		MAX_MEMORY=4096 KB /* 4096 KB is default */
+		,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS /* Safeguard to keep acceptable performance */
+		,MAX_DISPATCH_LATENCY=30 SECONDS /* 30 seconds is default and good balance for event_file as not so much stress is put on the system */
+		,MAX_EVENT_SIZE=0 KB /* Default */
+		,MEMORY_PARTITION_MODE=NONE /* Default */
+		,TRACK_CAUSALITY=OFF /* Default, no need to track causality */
+		,STARTUP_STATE=OFF /* This event session is started manually */
+	)
+
+';
+
+EXEC sp_executesql @sql;
+
+GO
+
+ALTER
+    EVENT SESSION
+        [Performance Trace]
+    ON SERVER
+    STATE = START;
+GO
+
+ALTER
+    EVENT SESSION
+        [Performance Trace]
+    ON SERVER
+    STATE = STOP;
+GO
+
+DROP EVENT SESSION [Performance Trace] ON SERVER
+GO
 
 -- Create an extended event session with a ring buffer
 -- Works with Azure SQL Database Managed Instance
