@@ -1,3 +1,16 @@
+-- Check status of Query Store for all user databases
+SELECT 
+    name AS DatabaseName,
+    CASE 
+        WHEN is_query_store_on = 1 THEN 'Enabled'
+        ELSE 'Disabled'
+    END AS QueryStoreStatus
+FROM sys.databases
+WHERE state_desc = 'ONLINE' -- Only include online databases
+	AND name NOT IN ('master', 'tempdb', 'model', 'msdb') -- Exclude system databases
+ORDER BY QueryStoreStatus ASC, DatabaseName ASC;
+
+
 -- Check if Query Store is enabled for a specific database
 -- Run the query in the context of the database you want to check
 SELECT actual_state_desc, desired_state_desc
