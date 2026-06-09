@@ -21,9 +21,22 @@ GO
 /*
  * Use this query to:
  *   - Find queries with long execution times
+ * Name: QSDUR01
  */
- 
-SELECT TOP 50 
+
+DECLARE @start_time_local DATETIME2 = '2026-05-22 15:00:00';
+DECLARE @end_time_local   DATETIME2 = '2026-05-22 17:00:00';
+
+DECLARE @start_time_utc DATETIMEOFFSET;
+DECLARE @end_time_utc   DATETIMEOFFSET;
+
+-- First: interpret local wall-clock time as Central Europe (handles CET/CEST automatically)
+-- Second: convert that moment to UTC
+SELECT
+    @start_time_utc = (@start_time_local AT TIME ZONE 'Central European Standard Time') AT TIME ZONE 'UTC',
+    @end_time_utc   = (@end_time_local   AT TIME ZONE 'Central European Standard Time') AT TIME ZONE 'UTC';
+
+SELECT 
 	  rs.runtime_stats_id
 	, p.plan_id
 	, q.query_id
@@ -33,6 +46,7 @@ SELECT TOP 50
 	, rs.max_duration / 1000 AS max_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
 	, rs.avg_duration / 1000 AS avg_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
 	, ROUND(rs.min_duration / 1000, 0) AS min_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	, rs.stdev_duration/ 1000 AS stdev_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
 	--, rs.max_duration / 1000000 AS max_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
 	--, rs.avg_duration / 1000000 AS avg_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
 	--, ROUND(rs.min_duration / 1000000, 0) AS min_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
@@ -53,12 +67,80 @@ WHERE
 	execution_type = 0 -- regular execution (successfully finished)
 --	AND q.query_id NOT IN (4524, 1058, 1521, 6911, 140/* 1520*/) -- Add/remove query ids here narrow down to the queries you are looking for
 	--AND q.query_id IN (15654) -- When you found the query, comment row above and select only that query here, and you will get the list of plans for that query
-	AND rsi.start_time > DATEADD(day, -7, GETDATE())
-	--AND rsi.start_time >= '2021-09-27 09:00:00.000' AND rsi.end_time <= '2021-09-27 10:00:00.000'
+	--AND rsi.start_time > DATEADD(day, -7, GETDATE())
+	AND rsi.start_time >= @start_time_utc AND rsi.end_time <= @end_time_utc
 ORDER BY 
 	rs.max_duration DESC
 	--rsi.start_time desc
 
+
+/*
+ * Use this query to:
+ *   - Find queries with long execution times and the corresponding wait types. 
+ * 
+ * Note: One query with multiple wait types will have one row per wait type in the response!
+ *
+ * Name: QSDUR01
+ */
+
+DECLARE @start_time_local DATETIME2 = '2026-06-01 10:00:00';
+DECLARE @end_time_local   DATETIME2 = '2026-06-01 11:00:00';
+
+DECLARE @start_time_utc DATETIMEOFFSET;
+DECLARE @end_time_utc   DATETIMEOFFSET;
+
+-- First: interpret local wall-clock time as Central Europe (handles CET/CEST automatically)
+-- Second: convert that moment to UTC
+SELECT
+    @start_time_utc = (@start_time_local AT TIME ZONE 'Central European Standard Time') AT TIME ZONE 'UTC',
+    @end_time_utc   = (@end_time_local   AT TIME ZONE 'Central European Standard Time') AT TIME ZONE 'UTC';
+
+SELECT 
+	  rs.runtime_stats_id
+	, p.plan_id
+	, q.query_id
+	, qt.query_text_id
+	, qt.query_sql_text
+	, rs.count_executions
+	, ROUND(rs.max_duration / 1000, 0) AS max_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	, ROUND(rs.avg_duration / 1000, 0) AS avg_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	, ROUND(rs.min_duration / 1000, 0) AS min_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	, ROUND(rs.stdev_duration/ 1000, 0) AS stdev_duration_in_ms -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.max_duration / 1000000 AS max_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.avg_duration / 1000000 AS avg_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
+	--, ROUND(rs.min_duration / 1000000, 0) AS min_duration_in_seconds -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.max_duration / 60000000 AS max_duration_in_minutes -- Use ms, seconds or minutes depending on your circumstances
+	--, ROUND(rs.avg_duration / 60000000, 0) AS avg_duration_in_minutes -- Use ms, seconds or minutes depending on your circumstances
+	--, rs.min_duration / 60000000 AS min_duration_in_minutes -- Use ms, seconds or minutes depending on your circumstances
+	-- waits
+	, wait_category
+	, wait_category_desc
+	, total_query_wait_time_ms
+	, avg_query_wait_time_ms
+	, min_query_wait_time_ms
+	, max_query_wait_time_ms
+	, stdev_query_wait_time_ms
+	, rs.max_rowcount, ROUND(rs.avg_rowcount, 0) AS avg_rowcount, rs.min_rowcount
+	, CONVERT(nvarchar(30), rsi.start_time, 120) as rsi_start_time
+	, CONVERT(nvarchar(30), rsi.end_time, 120) as rsi_endtime
+	, rs.last_execution_time
+	--, rs.*, rsi.*, p.*
+FROM sys.query_store_runtime_stats rs
+INNER JOIN sys.query_store_runtime_stats_interval rsi ON rs.runtime_stats_interval_id = rsi.runtime_stats_interval_id
+INNER JOIN sys.query_store_plan p ON rs.plan_id = p.plan_id
+INNER JOIN sys.query_store_query q ON p.query_id = q.query_id
+INNER JOIN sys.query_store_query_text qt ON q.query_text_id = qt.query_text_id
+INNER JOIN sys.query_store_wait_stats ws ON rs.plan_id = ws.plan_id AND rsi.runtime_stats_interval_id = ws.runtime_stats_interval_id AND p.plan_id = ws.plan_id
+WHERE 
+	rs.execution_type = 0 -- regular execution (successfully finished)
+--	AND q.query_id NOT IN (4524, 1058, 1521, 6911, 140/* 1520*/) -- Add/remove query ids here narrow down to the queries you are looking for
+	--AND q.query_id IN (15654) -- When you found the query, comment row above and select only that query here, and you will get the list of plans for that query
+	--AND rsi.start_time > DATEADD(day, -7, GETDATE())
+	AND rsi.start_time >= @start_time_utc AND rsi.end_time <= @end_time_utc
+	AND NOT rs.count_executions = 1
+ORDER BY 
+	rs.max_duration DESC
+	--rsi.start_time desc
 
 /*
  * Use this query to:

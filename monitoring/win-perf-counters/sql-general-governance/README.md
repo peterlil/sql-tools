@@ -18,3 +18,16 @@
     Note: LogRoot is the root folder where you want the logs, ex: C:\PerfLogs
     
 Done.
+
+
+## Full sample
+
+```powershell
+cd C:\temp
+
+Get-ExecutionPolicy
+
+Set-ExecutionPolicy RemoteSigned -Force
+
+.\Setup-Monitoring.ps1 -InstanceName <MyInstance> -LogRoot 'C:\PerfLogs'
+```

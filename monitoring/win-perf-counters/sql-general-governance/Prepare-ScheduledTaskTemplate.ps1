@@ -64,7 +64,7 @@ else {
 for ( $i = 0; $i -lt $strarr.Length; $i++ )
 { 
 	$strarr[$i] = ($strarr[$i] -replace "#InstanceName", $ReplaceString).TrimEnd();
-	$strarr[$i] = ($strarr[$i] -replace "#LogRoot", $LogRoot).TrimEnd();
+	$strarr[$i] = ($strarr[$i] -replace "#LogRoot#", $LogRoot).TrimEnd();
 }
 
 # add the instance name to the file name if it is supplied

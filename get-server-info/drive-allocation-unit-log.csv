@@ -1,0 +1,3 @@
+"Timestamp","ComputerName","DriveLetter","Label","FileSystem","CapacityGB","FreeSpaceGB","ClusterSizeBytes","ClusterSizeKB"
+"2026-05-30 22:07:16","WPW0F99EM","C:","Windows","NTFS","951,65","543,25","4096","4"
+"2026-05-30 22:07:16","WPW0F99EM","D:","Data","NTFS","953,74","858,33","4096","4"
